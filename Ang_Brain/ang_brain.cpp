@@ -16,7 +16,7 @@ void Ang_Brain::init() {
 void Ang_Brain::run() {
   
   //位置推定->走行戦略判定
-  gStrategyDet->Det_run(mXvalue, mYvalue);        //3: 判定を実行
+  gStrategyDet->Det_run(mXvalue, mYvalue, mYawangle);        //3: 判定を実行
 
   GetStrategy(gStrategyDet->StrategyNum,
 	      gStrategyDet->VirtualGateNum);      //4: 走行判定結果を取得
@@ -42,7 +42,7 @@ void Ang_Brain::run() {
 			       gStrategyDet->Min_Yawrate
 			       );      //6: ロボットの現在情報を取得
 
-  //  gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum);//7: 走行戦略を計算
+  gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
   gCommandCalc->Track_run();
   
   GetCalcResult(gCommandCalc->forward,
@@ -57,7 +57,7 @@ void Ang_Brain::setEyeCommand(int linevalue,
 			      float odo,
 			      float speed,
 			      float yawrate,
-			      float yawangle,
+			      float abs_angle,
 			      int   robo_tail_angle,
 			      bool  robo_stop,
 			      bool  robo_forward,
@@ -72,7 +72,7 @@ void Ang_Brain::setEyeCommand(int linevalue,
   mOdo             = odo; 
   mSpeed           = speed;
   mYawrate         = yawrate;
-  mYawangle        = yawangle;
+  mYawangle        = abs_angle;
   mTail_angle      = robo_tail_angle;
   mRobo_stop       = robo_stop;
   mRobo_forward    = robo_forward;

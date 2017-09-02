@@ -21,7 +21,8 @@ public:
 			    float odo,                
 			    float speed,
                             float yawrate,
-                            float yawangle,
+//                            float yawangle,
+                            float abs_angle,
 			    int   robo_tail_angle,
 			    bool  robo_stop,
 			    bool  robo_forward,
@@ -35,7 +36,7 @@ public:
 			    float min_yawrate
 			    );//ロボの現在情報を取得
 
-	void StrategyCalcRun(int strategy_num, int virtualgate_num);//走行戦略を計算
+	void StrategyCalcRun(int strategy_num, int virtualgate_num, float xvalue, float yvalue, float yawangle);//走行戦略を計算
 	void Track_run();
 
 	int   forward;         //前進目標値
@@ -49,7 +50,7 @@ private:
     void StartDashRunner();                              //スタートダッシュ
     void LineTracer(int line_value, float traceforward); //ライントレース
     void LineTracerYawrate(int line_value);              //ライントレース（ヨーレート）
-    void MapTracer(int virtualgate_num);                 //仮想ゲート走行
+    void MapTracer(int virtualgate_num, float mXvalue, float mYvalue, float mYawangle);  //仮想ゲート走行 0827 tada
     void StepRunner(int line_value, float odo, float angle, bool dansa);//段差走行
     void LookUpGateRunner();                             //ルックアップゲート走行
     void GarageRunner();                                 //ガレージ走行
@@ -69,7 +70,14 @@ private:
     enum enumStrategy{
       StartDash=510,
       LineTrace1=520,
-      MapTrace=530,
+      MapTrace1=531, //0828 tada
+      MapTrace2=532, //0828 tada
+      MapTrace3=533, //0828 tada
+      MapTrace4=534, //0828 tada
+      MapTrace5=535, //0828 tada
+      MapTrace6=536, //0828 tada
+      MapTrace7=537, //0828 tada
+      MapTrace8=538, //0828 tada
       Goal=610,
       Goal2Step=650,
       Step=710,

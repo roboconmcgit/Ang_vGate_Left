@@ -42,7 +42,14 @@ extern float STEP_TO_GARAGE_LENGTH;
 //Strategy_Det.o
 
 extern float LineTrace1Area[4];
-extern float MapTraceArea[4];
+extern float MapTraceArea1[4];
+extern float MapTraceArea2[4];
+extern float MapTraceArea3[4];
+extern float MapTraceArea4[4];
+extern float MapTraceArea5[4];
+extern float MapTraceArea6[4];
+extern float MapTraceArea7[4];
+extern float MapTraceArea8[4];
 
 extern float StartArea[4];
 extern float First_Straight[4];

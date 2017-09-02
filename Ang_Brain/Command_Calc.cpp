@@ -181,7 +181,7 @@ void CommandCalc::Track_run( ) {
   }
 }
 
-void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num) {
+void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float xvalue, float yvalue, float yawangle) {
 
   Strategy=static_cast<enumStrategy>(strategy_num);
 
@@ -198,9 +198,61 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num) {
 		
 	break;
 
-	case MapTrace:
-		//VirtualGateDet();
-		MapTracer(virtualgate_num);
+
+	case MapTrace1:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
+	break;
+
+	case MapTrace2:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
+	break;
+
+	case MapTrace3:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
+	break;
+
+	case MapTrace4:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
+	break;
+
+	case MapTrace5:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
+	break;
+
+	case MapTrace6:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
+	break;
+
+	case MapTrace7:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
+	break;
+
+	case MapTrace8:
+		forward = 95; //0827 tada
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		anglecommand = TAIL_ANGLE_RUN; //0827 tada
+		tail_mode_lflag = false; //0827 tada
 	break;
 
 	case Goal:
@@ -302,44 +354,218 @@ void CommandCalc::LineTracerYawrate(int line_value) {
 
 }
 
-void CommandCalc::MapTracer(int virtualgate_num) {
+void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, float mYawangle) {
+
+	float Virtual_S1[4]={900-160,0,900-160, 3000};
+//	float Virtual_C1[3]={(Virtual_S1[2] + 500),Virtual_S1[3],500};
+//	float Virtual_C1[3]={2400,3000,1500};
+	float Virtual_C1[3]={1400-160,3000,500};
+//	float Virtual_S2[4]={1210,1800,1558,2800};
+	float Virtual_S2[4]={1858-160,2800,1210-160,1800};
+	float Virtual_C2[3]={1700-160,1700,500};
+	float Virtual_S4[4]={3600-160,2100,100000-160,2100};
+	float Virtual_C3[3]={3600-160,1600,500};
+	float Virtual_S3[4]={1900-160,1241,3300-160,2000};
+
+	float extend_gain = 1.0;
+	float Virtual_point_dist = 50.0;
+	
+	float x0,x1,x2,y0,y1,y2,a,a2,b,b2,r2,c,d,tt,f1,x10,y10,x12,y12;
 
 	VirtualGate=static_cast<enumVirtualGate>(virtualgate_num);
 
 	switch(VirtualGate){
 	case Gate12:
+//	    y_t = -1.0*(((float)50-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_S1[0]*extend_gain;
+		y1 = Virtual_S1[1]*extend_gain;
+		x2 = Virtual_S1[2]*extend_gain;
+		y2 = Virtual_S1[3]*extend_gain;
+		x12 = x2-x1;
+		y12 = y2-y1;
+		x10 = x0-x1;
+		y10 = y0-y1;
+		a = (x12*y10)-(y12*x10);
+		y_t = a/sqrt(pow(x12,2.0) + pow(y12,2.0));
+		
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+//		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+//    	yawratecmd = 0.0;
+	    y_t_prev = y_t;
 
 	break;
 
 	case Gate23:
+		
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_C1[0]*extend_gain;
+		y1 = Virtual_C1[1]*extend_gain;
+		a = x1 - x0;
+		b = y1 - y0;
+		a2 = a * a;
+		b2 = b * b;
+		r2 = a2 + b2;
+		y_t = sqrt(r2) - Virtual_C1[2]*extend_gain;
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+//		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+	    y_t_prev = y_t;
 
 	break;
 
 	case Gate34:
-
-	break;
+	
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_C1[0]*extend_gain;
+		y1 = Virtual_C1[1]*extend_gain;
+		a = x1 - x0;
+		b = y1 - y0;
+		a2 = a * a;
+		b2 = b * b;
+		r2 = a2 + b2;
+		y_t = sqrt(r2) - Virtual_C1[2]*extend_gain;
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+//		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+	    y_t_prev = y_t;	break;
 
 	case Gate45:
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_S2[0]*extend_gain;
+		y1 = Virtual_S2[1]*extend_gain;
+		x2 = Virtual_S2[2]*extend_gain;
+		y2 = Virtual_S2[3]*extend_gain;
+		x12 = x2-x1;
+		y12 = y2-y1;
+		x10 = x0-x1;
+		y10 = y0-y1;
+		a = (x12*y10)-(y12*x10);
+		y_t = a/sqrt(pow(x12,2.0) + pow(y12,2.0));
+		
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+//		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+//    	yawratecmd = 0.0;
+	    y_t_prev = y_t;
 
 	break;
 
 	case Gate56:
+	
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_C2[0]*extend_gain;
+		y1 = Virtual_C2[1]*extend_gain;
+		a = x1 - x0;
+		b = y1 - y0;
+		a2 = a * a;
+		b2 = b * b;
+		r2 = a2 + b2;
+		y_t = sqrt(r2) - Virtual_C2[2]*extend_gain;
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+	    y_t_prev = y_t;	break;
+
 
 	break;
 
 	case Gate67:
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_S3[0]*extend_gain;
+		y1 = Virtual_S3[1]*extend_gain;
+		x2 = Virtual_S3[2]*extend_gain;
+		y2 = Virtual_S3[3]*extend_gain;
+		x12 = x2-x1;
+		y12 = y2-y1;
+		x10 = x0-x1;
+		y10 = y0-y1;
+		a = (x12*y10)-(y12*x10);
+		y_t = a/sqrt(pow(x12,2.0) + pow(y12,2.0));
+		
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+//		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+//    	yawratecmd = 0.0;
+	    y_t_prev = y_t;
 
 	break;
 
 	case Gate78:
+	
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_C3[0]*extend_gain;
+		y1 = Virtual_C3[1]*extend_gain;
+		a = x1 - x0;
+		b = y1 - y0;
+		a2 = a * a;
+		b2 = b * b;
+		r2 = a2 + b2;
+		y_t = sqrt(r2) - Virtual_C3[2]*extend_gain;
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+	    y_t_prev = y_t;	break;
 
 	break;
 
 	case Gate89:
+		x0 = mXvalue+Virtual_point_dist*cos(mYawangle);
+		y0 = mYvalue+Virtual_point_dist*sin(mYawangle);
+		x1 = Virtual_S4[0]*extend_gain;
+		y1 = Virtual_S4[1]*extend_gain;
+		x2 = Virtual_S4[2]*extend_gain;
+		y2 = Virtual_S4[3]*extend_gain;
+		x12 = x2-x1;
+		y12 = y2-y1;
+		x10 = x0-x1;
+		y10 = y0-y1;
+		a = (x12*y10)-(y12*x10);
+		y_t = a/sqrt(pow(x12,2.0) + pow(y12,2.0));
+		
+	    if(y_t > 10.0) y_t = 10.0;
+	    if(y_t < -10.0) y_t = -10.0;
+		
+//		y_t = -1.0*y_t;
+		
+    	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+//    	yawratecmd = 0.0;
+	    y_t_prev = y_t;
 
 	break;
 
 	default:
+		yawratecmd = 0.0;
+		forward = 0;
 
 	break;
 	}

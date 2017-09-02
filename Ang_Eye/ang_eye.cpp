@@ -90,12 +90,15 @@ void Ang_Eye::WheelOdometry(float dT) {
   velocity       = Clpfd * velocity_prev + Dlpfd * velocity_input;
   velocity_prev  = Alpfd * velocity_prev + Blpfd * velocity_input;
   
-  xvalue = xvalue+(-1)*(odo-odo_prev)*sin(relative_angle);
-  yvalue = yvalue+(odo-odo_prev)*cos(relative_angle);    
+//  xvalue = xvalue+(-1)*(odo-odo_prev)*sin(yawangle);
+//  yvalue = yvalue+(odo-odo_prev)*cos(yawangle);    
 
   relative_angle =  ((float)WheelAngRdeg - (float)WheelAngLdeg) * RAD_1_DEG * WHEEL_R / RoboTread; //ロボのYaw角[rad]
   relative_angle = relative_angle + correction_angle;
   abs_angle      = relative_angle + RAD_90_DEG + correction_angle;
+  xvalue = xvalue+(odo-odo_prev)*cos(abs_angle); //0902 tada
+  yvalue = yvalue+(odo-odo_prev)*sin(abs_angle); //0902 tada
+
 #ifdef DEBUG_NANSYO
   abs_angle      = relative_angle;
 #endif

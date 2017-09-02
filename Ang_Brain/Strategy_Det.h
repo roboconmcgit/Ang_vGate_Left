@@ -11,7 +11,7 @@
 class StrategyDet {
 public:
 	explicit StrategyDet();                      //コンストラクタ
-	void Det_run(float x_value, float y_value); //判定を実行
+	void Det_run(float x_value, float y_value, float yawangle); //判定を実行
 
 	int StrategyNum;   //走行戦略
 	int VirtualGateNum;//仮想ゲート
@@ -21,20 +21,28 @@ public:
 
 private:
 
-	void RunningStrategyDet(float x_value, float y_value);//走行戦略判定
-	void VirtualGateDet(float x_value, float y_value);//仮想ゲート判定
+	void RunningStrategyDet(float x_value, float y_value, float yawangle);//走行戦略判定
+	void VirtualGateDet(float x_value, float y_value, float yawangle);//仮想ゲート判定
 
 	bool Robo_Area_Estimator(float x_left,
                                 float x_right,
                                 float y_under,
                                 float y_top,
                                 float x_value,
-                                float y_value);//走行エリア推定
+                                float y_value,
+                                float yawangle);//走行エリア推定
 
 	enum enumStrategy{
 		StartDash=510,
 		LineTrace1=520,
-		MapTrace=530,
+		MapTrace1=531,
+		MapTrace2=532,
+		MapTrace3=533,
+		MapTrace4=534,
+		MapTrace5=535,
+		MapTrace6=536,
+		MapTrace7=537,
+		MapTrace8=538,
 		Goal=610,
 		Goal2Step=650,
 		Step=710,
