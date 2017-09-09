@@ -74,6 +74,7 @@ void CommandCalc::Track_run( ) {
   int dammy_line_value;
 
   switch(Track_Mode){
+
   case Start_to_1st_Corner:
     forward = mMax_Forward;
     LineTracerYawrate(mLinevalue);

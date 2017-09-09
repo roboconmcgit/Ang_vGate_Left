@@ -527,8 +527,7 @@ void main_task(intptr_t unused) {
   ter_tsk(BT_TASK);
   slp_tsk();  // バックボタンが押されるまで待つ
 
-  ev3_stp_cyc(EYE_CYC);
-  ev3_stp_cyc(BRAIN_CYC);
+
   ev3_stp_cyc(ROBO_CYC);
 
   gLeftWheel.~Motor();

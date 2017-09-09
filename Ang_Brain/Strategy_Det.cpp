@@ -31,7 +31,7 @@ void StrategyDet::RunningStrategyDet(float x_value, float y_value, float yawangl
     Max_Yawrate = 1.5;
     Min_Yawrate = -1.5;
   }
-
+  /*
   else if (Robo_Area_Estimator(First_Straight[0],First_Straight[1],First_Straight[2],First_Straight[3],x_value,y_value,yawangle)){
     Strategy=LineTrace1;
     Max_Forward = 100;
@@ -57,6 +57,7 @@ void StrategyDet::RunningStrategyDet(float x_value, float y_value, float yawangl
     Max_Yawrate = 1.5;
     Min_Yawrate = -1.5;
   }
+  */
   /*
   else if(Robo_Area_Estimator(GoalArea[0],GoalArea[1],GoalArea[2],GoalArea[3],x_value,y_value,yawangle)){
     //Strategy=Goal;
