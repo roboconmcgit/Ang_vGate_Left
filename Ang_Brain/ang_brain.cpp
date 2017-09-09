@@ -43,7 +43,7 @@ void Ang_Brain::run() {
 			       );      //6: ロボットの現在情報を取得
 
   gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
-  gCommandCalc->Track_run();
+//  gCommandCalc->Track_run(); //0909 tada
   
   GetCalcResult(gCommandCalc->forward,
 		gCommandCalc->yawratecmd,

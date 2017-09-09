@@ -32,14 +32,14 @@ float STEP_TO_GARAGE_LENGTH =  900;
 //x_left, x_right, y_under, y_top
 
 float LineTrace1Area[4]={0, 0, 0, 0};
-float MapTraceArea1[4]={0, 770, 2100, 1260};
-float MapTraceArea2[4]={0, 1750, 4200, 2100};
-float MapTraceArea3[4]={770, 1750, 2100, 1960};
-float MapTraceArea4[4]={770, 1330, 1960, 1260};
-float MapTraceArea5[4]={770, 1330, 1260, 0};
-float MapTraceArea6[4]={1330, 2310, 1960, 0};
-float MapTraceArea7[4]={2310, 2380, 1960, 1050};
-float MapTraceArea8[4]={2380, 3780, 1960, 1050};
+float MapTraceArea1[4]={0, 936.52, 0, 2558.54};
+float MapTraceArea2[4]={0, 2100, 2558.54, 3800, 2558.54};
+float MapTraceArea3[4]={936.52, 2100, 2523.54, 2558.54};
+float MapTraceArea4[4]={936.52, 1592.76, 1344.29, 2523.54};
+float MapTraceArea5[4]={936.52, 1592.76, 0, 1344.29};
+float MapTraceArea6[4]={1592.76, 2487.29, 0, 2523.54};
+float MapTraceArea7[4]={2487.29, 3024.44, 0, 2523.54};
+float MapTraceArea8[4]={3024.44, 4600, 0, 2523.54};
 
 float StartArea[4]       = {-200,  200, -200,  500};
 float First_Straight[4]  = {-200,  200,  500, 2000};
@@ -54,13 +54,13 @@ float LookUpGateArea[4]={0, 0, 0, 0};
 float GarageArea[4]={0, 0, 0, 0};
 float StopArea[4]={0, 0, 0, 0};
 
-float Gate12Area[4]={0, 770, 2100, 1260};
-float Gate23Area[4]={0, 1750, 4200, 2100};
-float Gate34Area[4]={770, 1750, 2100, 1960};
-float Gate45Area[4]={770, 1330, 1960, 1260};
-float Gate56Area[4]={770, 1330, 1260, 0};
-float Gate67Area[4]={1330, 2310, 1960, 0};
-float Gate78Area[4]={2310, 2380, 1960, 1050};
-float Gate89Area[4]={2380, 3780, 1960, 1050};
+float Gate12Area[4]={0, 936.52, 0, 2558.54};
+float Gate23Area[4]={0, 2100, 2558.54, 3800};
+float Gate34Area[4]={936.52, 2100, 2523.54, 2558.54};
+float Gate45Area[4]={936.52, 1592.76, 1344.29, 2523.54};
+float Gate56Area[4]={936.52, 1592.76, 0, 1344.29};
+float Gate67Area[4]={1592.76, 2487.29, 0, 2523.54};
+float Gate78Area[4]={2487.29, 3024.44, 0, 2523.54};
+float Gate89Area[4]={3024.44, 4600, 0, 2523.54};
 
 
