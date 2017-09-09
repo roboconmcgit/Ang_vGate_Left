@@ -32,6 +32,8 @@ public:
 
     float odo       = 0;//odometry
     float velocity  = 0;//Velocity
+    float odo       = 0.0;//odometry
+    float velocity  = 0.0;//Velocity
 
     int   encR      = 0;//右側タイヤ角度
     int   encL      = 0;
