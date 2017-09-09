@@ -192,7 +192,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case LineTrace1:
-	  forward = mMax_Forward;
 	  forward = 100;
 	  LineTracerYawrate(mLinevalue);
 	  anglecommand = TAIL_ANGLE_RUN; //0817 tada
@@ -202,7 +201,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 
 
 	case MapTrace1:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -210,7 +208,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case MapTrace2:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -218,7 +215,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case MapTrace3:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -226,7 +222,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case MapTrace4:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -234,7 +229,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case MapTrace5:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -242,7 +236,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case MapTrace6:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -250,7 +243,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case MapTrace7:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -258,7 +250,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case MapTrace8:
-		forward = mMax_Forward; //0827 tada
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
@@ -291,7 +282,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	default:
-
 	  forward = 10;
 	break;
 	}
@@ -453,7 +443,6 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-	    y_t_prev = y_t;	break;
 		yawratecmd = 0.0;
 	    y_t_prev = y_t;
 		break;
@@ -478,7 +467,6 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
     	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
@@ -528,7 +516,6 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
     	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
