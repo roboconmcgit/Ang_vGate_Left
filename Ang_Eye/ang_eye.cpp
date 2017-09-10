@@ -95,7 +95,6 @@ void Ang_Eye::WheelOdometry(float dT) {
 
   relative_angle =  ((float)WheelAngRdeg - (float)WheelAngLdeg) * RAD_1_DEG * WHEEL_R / RoboTread; //ロボのYaw角[rad]
   relative_angle = relative_angle + correction_angle;
-  abs_angle      = relative_angle + RAD_90_DEG + correction_angle;
   xvalue = xvalue+(odo-odo_prev)*cos(abs_angle); //0902 tada
   yvalue = yvalue+(odo-odo_prev)*sin(abs_angle); //0902 tada
 
@@ -122,8 +121,6 @@ void Ang_Eye::WheelOdometry(float dT) {
     }else if(odo > 1500 && odo <= 1505){
       angle_ave_dat = angle_sum_dat/cap_cnt;
       correction_angle = RAD_90_DEG - angle_ave_dat;
-      xvalue = 0.0;
-      yvalue = 1505;
 
       enum_Mode = DET_MOVEMENT;
       angle_sum_dat = 0;
