@@ -80,11 +80,11 @@ void Ang_Robo::run() {
 
     int battery = ev3_battery_voltage_mV();
     
-    if((Stand_Mode == Stand_to_Balance)&&(log_left_pwm < -20)){
+    if((Stand_Mode == Stand_to_Balance)&&(log_left_pwm < -10)){
       mBalancer->setCommand(mForward, mTurn);
       mBalancer->update(10, rightWheelEnc, leftWheelEnc, battery);
       
-    }else if((Stand_Mode == Stand_to_Balance)&&(log_left_pwm > 20)){
+    }else if((Stand_Mode == Stand_to_Balance)&&(log_left_pwm > 10)){
       mBalancer->setCommand(mForward, mTurn);
       mBalancer->update(-10, rightWheelEnc, leftWheelEnc, battery);
     }else{
@@ -317,36 +317,32 @@ void Ang_Robo::tail_stand_from_balance(){
     balance_off_en = true;
     tail_control(96);
 
-
-    if((log_left_pwm >= -20) && (log_left_pwm <= 20) && ((robo_Clock->now() - clock_start) > 1000)){
-      mForward       = 0;
-      mTurn          = 0; 
-      balance_off_en = false;
-      Stand_Mode     = Tail_for_Run;
-      tail_control(96);
+    if((robo_Clock->now() - clock_start) > 1000){
+      //    if((log_left_pwm >= -20) && (log_left_pwm <= 20) && ((robo_Clock->now() - clock_start) > 1000)){
+      if((log_left_pwm >= -10) && (log_left_pwm <= 10)){
+	mForward       = 0;
+	mTurn          = 0; 
+	//	balance_off_en = false;
+	balance_off_en = true;
+	Stand_Mode     = Tail_for_Run;
+	tail_control(96);
+      }
     }
     break;
 
   case Tail_for_Run:
     mForward = 0;
     mTurn    = 0; 
-    balance_off_en = false;
+    tail_control(98);
+    balance_off_en = true;
 
-    if(mTail_Motor.getCount() >=  98){
-      tail_control(98);
-      clock_start = robo_Clock->now();
-      Stand_Mode = Balance_Mode;
-    }
-
-    if(mTail_Motor.getCount() <= 98){
-      target_tail_angle = target_tail_angle + 1;
-      tail_control(target_tail_angle);
-    }else{
-      tail_control(98);
-      clock_start = robo_Clock->now();
-      Stand_Mode = Balance_Mode;
+    if(mTail_Motor.getCount() >=  97){
+      Stand_Mode     = Balance_Mode;
+      balance_off_en = false;
     }
     break;
+
+
 
   default:
     mForward = 0;

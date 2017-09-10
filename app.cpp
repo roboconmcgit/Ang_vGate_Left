@@ -34,7 +34,7 @@ using ev3api::Clock;
 #define CALIB_FONT        (EV3_FONT_MEDIUM)
 #define CALIB_FONT_WIDTH  (6/*TODO: magic number*/)
 #define CALIB_FONT_HEIGHT (20/*TODO: magic number*/)
-//#define LOG_RECORD
+#define LOG_RECORD
 //#define RIGHT_COURCE_MODE
 //#define EYE_DEBUG
 
@@ -90,9 +90,17 @@ static int   log_dat_00[10000];
 static int   log_dat_01[10000];
 static int   log_dat_02[10000];
 static int   log_dat_03[10000];
-static float log_fdat_00[10000];
-static float log_fdat_01[10000];    
-static float log_fdat_02[10000];
+static int   log_dat_04[10000];
+static int   log_dat_05[10000];
+static int   log_dat_06[10000];
+static int   log_dat_07[10000];
+
+/*
+static float log_fdat_00[15000];
+static float log_fdat_01[15000];    
+static float log_fdat_02[15000];
+*/
+
 #endif
 
 //System Initialization
@@ -194,13 +202,21 @@ static void sys_destroy(){
 #ifdef LOG_RECORD
 static void log_dat( ){
 
-  log_dat_00[log_cnt]  = gAng_Eye->robo_forward;
-  log_dat_01[log_cnt]  = gAng_Eye->robo_turn_left;
-  log_dat_02[log_cnt]  = gAng_Eye->odo;
-  log_dat_03[log_cnt]  = gAng_Eye->dansa;
+  log_dat_00[log_cnt]  = gAng_Brain->tail_mode_lflag;
+  log_dat_01[log_cnt]  = gAng_Robo-> log_forward;
+  log_dat_02[log_cnt]  = gAng_Robo-> log_gyro;
+  log_dat_03[log_cnt]  = gTailMotor.getCount();
+
+  log_dat_04[log_cnt]  = gAng_Robo-> log_left_wheel_enc;
+  log_dat_05[log_cnt]  = gAng_Robo-> log_battery;
+  log_dat_06[log_cnt]  = gAng_Robo-> log_left_pwm;
+  log_dat_07[log_cnt]  = gAng_Robo-> log_right_pwm;
+
+  /*
   log_fdat_00[log_cnt] = gAng_Eye->abs_angle;
-  log_fdat_01[log_cnt] = gAng_Eye->yawrate;
-  log_fdat_02[log_cnt] = gAng_Eye->velocity;
+  log_fdat_01[log_cnt] = gAng_Robo->log_right_pwm;
+  log_fdat_02[log_cnt] = gAng_Eye->odo;
+  */
 
   log_cnt++;
   if (log_cnt == log_size){
@@ -213,15 +229,16 @@ static void export_log_dat( ){
     int battery = ev3_battery_voltage_mV();
     file_id = fopen( "log_dat.csv" ,"w");
     fprintf(file_id, "battery:%d\n",battery);
-    fprintf(file_id, "cnt,forward,left,odo,dansa,angle,yawrate,velocity\n");
+    fprintf(file_id, "tail_mode,forward,gyro,tail_angle,left_wheel_enc,battery,left_pwm,right_pwwm\n");
     int cnt;
 
     for(cnt = 0; cnt < log_size ; cnt++){
-      fprintf(file_id, "%d,%d,%d,%d,%d,%f,%f,%f\n",cnt, log_dat_00[cnt],log_dat_01[cnt], log_dat_02[cnt],log_dat_03[cnt],log_fdat_00[cnt],log_fdat_01[cnt], log_fdat_02[cnt]);
+      fprintf(file_id, "%d,%d,%d,%d,%d,%d,%d,%d\n",log_dat_00[cnt],log_dat_01[cnt], log_dat_02[cnt],log_dat_03[cnt],log_dat_04[cnt],log_dat_05[cnt],log_dat_06[cnt],log_dat_07[cnt]);
     }
     fclose(file_id);
 }
 #endif
+
 
 //*****************************************************************************
 // 関数名 : color_sensor_calibration
