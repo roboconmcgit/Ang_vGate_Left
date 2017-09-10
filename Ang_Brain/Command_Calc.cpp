@@ -122,6 +122,7 @@ void CommandCalc::Track_run( ) {
 
     break;
 
+<<<<<<< HEAD
     case Get_Ref_Odo:
     forward =  50;
     dammy_line_value = 50 - 300*mYawangle;
@@ -133,6 +134,11 @@ void CommandCalc::Track_run( ) {
 
     LineTracerYawrate(dammy_line_value);
     ref_odo = mOdo + DEAD_ZONE_LENGTH;
+=======
+  case Get_Ref_Odo:
+    forward =  50;
+      ref_odo = mOdo + DEAD_ZONE_LENGTH;
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
   	Track_Mode = Dead_Zone;
 
     break;
@@ -278,18 +284,23 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 
 	case MapTrace8:
 		forward = 100; //0827 tada
+<<<<<<< HEAD
 		if(mLinevalue > 20){
 			LineTracerYawrate(mLinevalue);
 		}
 		else{
 			MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		}
+=======
+		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
 		tail_mode_lflag = false; //0827 tada
 		Track_Mode = Get_Ref_Odo;//0910 tada
 	break;
 
 	case Goal:
+		Track_Mode = Get_Ref_Odo;//0909 tada
 
 	break;
 
@@ -398,12 +409,16 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_C3[3]={3024.44,790.66,1009.34};
 	float Virtual_S4[4]={3024.44,1800,4613.06,1800};
 */
+<<<<<<< HEAD
 	/*ライン（安）１
+=======
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
 	float Virtual_S1[4]={735.96,415.74,735.96, 2558.54};
 	float Virtual_C1[3]={1083.86,2558.54,347.9};
 	float Virtual_S2[4]={1426.36,2494.88,1210.99,1290.24};
 	float Virtual_C2[3]={1458.8,1246.03,251.72};
 	float Virtual_S3[4]={1601.26,1038.5,2487.14,1645.11};
+<<<<<<< HEAD
 	float Virtual_C3[3]={3302.03,349.04,1530.96};
 	float Virtual_S4[4]={3302.03,1880.0,4600.0,2050.0};
 	*/
@@ -416,6 +431,12 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_C3[3]={3202.03,349.04,1530.96};
 	float Virtual_S4[4]={3202.03,1880.0,4600.0,2050.0};
 //*/
+=======
+	float Virtual_C3[3]={3294.63,374.69,1505.32};
+//	float Virtual_S4[4]={3294.63,1880.0,4600.0,1880.0};
+	float Virtual_S4[4]={3294.63,1880.0,4600.0,2100.0};
+
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
 	float extend_gain = 1.0;
 	float Virtual_point_dist = 50.0;
 	
@@ -468,7 +489,15 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+<<<<<<< HEAD
+//		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
 	    y_t_prev = y_t;
 
 	break;
@@ -491,7 +520,15 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+<<<<<<< HEAD
+//		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
 	    y_t_prev = y_t;
 		break;
 
@@ -515,7 +552,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
+    	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
 	break;
@@ -538,7 +575,15 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+<<<<<<< HEAD
+//		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
 	    y_t_prev = y_t;	break;
 
 
@@ -564,7 +609,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
+    	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
 	break;
@@ -587,7 +632,15 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+<<<<<<< HEAD
+//		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
+>>>>>>> 4d462886c51ec0cadaeb7136944d361b1948d18a
 	    y_t_prev = y_t;	break;
 
 	break;
@@ -612,7 +665,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
+    	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
 	break;
