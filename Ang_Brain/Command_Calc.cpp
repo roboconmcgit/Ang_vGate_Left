@@ -434,7 +434,11 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
 	    y_t_prev = y_t;
 
 	break;
@@ -457,7 +461,11 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
 	    y_t_prev = y_t;
 		break;
 
@@ -481,7 +489,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
+    	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
 	break;
@@ -504,7 +512,11 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
 	    y_t_prev = y_t;	break;
 
 
@@ -530,7 +542,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
+    	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
 	break;
@@ -553,7 +565,11 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+<<<<<<< HEAD
 //		yawratecmd = 0.0;
+=======
+		yawratecmd = 0.0;
+>>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
 	    y_t_prev = y_t;	break;
 
 	break;
@@ -578,7 +594,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //		y_t = -1.0*y_t;
 		
     	yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
-//    	yawratecmd = 0.0;
+    	yawratecmd = 0.0;
 	    y_t_prev = y_t;
 
 	break;
