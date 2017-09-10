@@ -104,6 +104,7 @@ private:
       Snd_Corner,
       Final_Corner,
       Final_Straight,
+      Get_Ref_Odo,
       Dead_Zone,
       Return_to_Line,
       Go_Step,
