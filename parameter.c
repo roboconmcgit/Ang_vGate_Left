@@ -25,7 +25,6 @@ float WHEEL_R       = 39.975; //Wheel radius
 int   RoboTread      = 160.0; //トレッド長さ[mm]
 
 float FINAL_STRAIGHT_LENGTH =  1100.0;
-float DEAD_ZONE_LENGTH      =  600.0;
 //float DEAD_ZONE_LENGTH      =  600.0;
 float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
 float STEP_TO_GARAGE_LENGTH =  900.0;
@@ -53,8 +52,6 @@ float MapTraceArea5[4]={936.52, 1601.26, 0.0, 1290.24};
 float MapTraceArea6[4]={1601.26, 2487.29, 0.0, 2497.44};
 float MapTraceArea7[4]={2487.29, 3302.03, 0.0, 2497.44};
 float MapTraceArea8[4]={3302.03, 4200.0, 0.0, 2497.44};
-
-
 */
 ///*
 float LineTrace1Area[4]={0.0, 936.52, 0.0, 2000.0};

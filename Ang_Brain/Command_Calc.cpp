@@ -122,10 +122,8 @@ void CommandCalc::Track_run( ) {
 
     break;
 
-  case Get_Ref_Odo:
     case Get_Ref_Odo:
     forward =  50;
-      ref_odo = mOdo + DEAD_ZONE_LENGTH;
     dammy_line_value = 50 - 300*mYawangle;
     if(dammy_line_value > 100){
       dammy_line_value = 100;
@@ -156,8 +154,6 @@ void CommandCalc::Track_run( ) {
     break;
 
   case Return_to_Line:
-    forward =  50;
-    LineTracerYawrate((2*mLinevalue));
 //    forward =  50; // 0910 tada
     forward =  20; // 0910 tada
   	if(mYawangle < 0.16 && mLinevalue <20){
@@ -282,7 +278,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 
 	case MapTrace8:
 		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
 		if(mLinevalue > 20){
 			LineTracerYawrate(mLinevalue);
 		}
@@ -295,7 +290,6 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	break;
 
 	case Goal:
-		Track_Mode = Get_Ref_Odo;//0909 tada
 
 	break;
 
@@ -410,10 +404,6 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_S2[4]={1426.36,2494.88,1210.99,1290.24};
 	float Virtual_C2[3]={1458.8,1246.03,251.72};
 	float Virtual_S3[4]={1601.26,1038.5,2487.14,1645.11};
-	float Virtual_C3[3]={3294.63,374.69,1505.32};
-//	float Virtual_S4[4]={3294.63,1880.0,4600.0,1880.0};
-	float Virtual_S4[4]={3294.63,1880.0,4600.0,2100.0};
-
 	float Virtual_C3[3]={3302.03,349.04,1530.96};
 	float Virtual_S4[4]={3302.03,1880.0,4600.0,2050.0};
 	*/
