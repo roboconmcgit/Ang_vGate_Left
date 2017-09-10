@@ -30,9 +30,12 @@ float STEP_TO_GARAGE_LENGTH =  900.0;
 
 //Strategy_Det.o
 //x_left, x_right, y_under, y_top
+<<<<<<< HEAD
 /*ライン（攻）
 float LineTrace1Area[4]={0.0, 936.52, 0.0, 2000.0};
 float MapTraceArea1[4]={0.0, 936.52, 2000.0, 2558.54};
+=======
+
 float LineTrace1Area[4]={0.0, 0.0, 0.0, 0.0};
 float MapTraceArea1[4]={0.0, 936.52, 0.0, 2558.54};
 >>>>>>> 73e53023dccf5ad554c76cbf8fdc710075b82286
@@ -42,6 +45,7 @@ float MapTraceArea4[4]={936.52, 1592.76, 1344.29, 2523.54};
 float MapTraceArea5[4]={936.52, 1592.76, 0.0, 1344.29};
 float MapTraceArea6[4]={1592.76, 2487.29, 0.0, 2523.54};
 float MapTraceArea7[4]={2487.29, 3024.44, 0.0, 2523.54};
+<<<<<<< HEAD
 float MapTraceArea8[4]={3024.44, 4200.0, 0.0, 2523.54};
 */
 float LineTrace1Area[4]={0.0, 936.52, 0.0, 2000.0};
