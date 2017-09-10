@@ -25,7 +25,8 @@ float WHEEL_R       = 39.975; //Wheel radius
 int   RoboTread      = 160.0; //トレッド長さ[mm]
 
 float FINAL_STRAIGHT_LENGTH =  1100.0;
-float DEAD_ZONE_LENGTH      =  600.0;
+//float DEAD_ZONE_LENGTH      =  600.0;
+float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
 float STEP_TO_GARAGE_LENGTH =  900.0;
 
 //Strategy_Det.o
@@ -41,6 +42,7 @@ float MapTraceArea6[4]={1592.76, 2487.29, 0.0, 2523.54};
 float MapTraceArea7[4]={2487.29, 3024.44, 0.0, 2523.54};
 float MapTraceArea8[4]={3024.44, 4200.0, 0.0, 2523.54};
 */
+/* ライン（安）１
 float LineTrace1Area[4]={0.0, 936.52, 0.0, 2000.0};
 float MapTraceArea1[4]={0.0, 936.52, 2000.0, 2558.54};
 float MapTraceArea2[4]={0.0, 2100.0, 2558.54, 3800.0};
@@ -50,8 +52,18 @@ float MapTraceArea5[4]={936.52, 1601.26, 0.0, 1290.24};
 float MapTraceArea6[4]={1601.26, 2487.29, 0.0, 2497.44};
 float MapTraceArea7[4]={2487.29, 3302.03, 0.0, 2497.44};
 float MapTraceArea8[4]={3302.03, 4200.0, 0.0, 2497.44};
-
-
+*/
+///*
+float LineTrace1Area[4]={0.0, 936.52, 0.0, 2000.0};
+float MapTraceArea1[4]={0.0, 936.52, 2000.0, 2558.54};
+float MapTraceArea2[4]={0.0, 2100.0, 2558.54, 3800.0};
+float MapTraceArea3[4]={936.52, 2100.0, 2497.44, 2558.54};
+float MapTraceArea4[4]={936.52, 1614.4, 1290.24, 2497.44};
+float MapTraceArea5[4]={936.52, 1614.4, 0.0, 1290.24};
+float MapTraceArea6[4]={1614.4, 2255.65, 0.0, 2497.44};
+float MapTraceArea7[4]={2255.65, 3202.03, 0.0, 2497.44};
+float MapTraceArea8[4]={3202.03, 4200.0, 0.0, 2497.44};
+//*/
 float StartArea[4]       = {-200.0,  200.0, -200.0,  500.0};
 float First_Straight[4]  = {-200.0,  200.0,  500.0, 2000.0};
 float First_Corner[4]    = {-200.0, 2000.0, 2000.0, 3500.0};
@@ -75,6 +87,7 @@ float Gate67Area[4]={1592.76, 2487.29, 0.0, 2523.54};
 float Gate78Area[4]={2487.29, 3024.44, 0.0, 2523.54};
 float Gate89Area[4]={3024.44, 4200.0, 0.0, 2523.54};
 */
+/* ライン（安）１
 float Gate12Area[4]={0.0, 936.52, 2000.0, 2558.54};
 float Gate23Area[4]={0.0, 2100.0, 2558.54, 3800.0};
 float Gate34Area[4]={936.52, 2100.0, 2497.44, 2558.54};
@@ -83,3 +96,14 @@ float Gate56Area[4]={936.52, 1601.26, 0.0, 1290.24};
 float Gate67Area[4]={1601.26, 2487.29, 0.0, 2497.44};
 float Gate78Area[4]={2487.29, 3302.03, 0.0, 2497.44};
 float Gate89Area[4]={3302.03, 4200.0, 0.0, 2497.44};
+*/
+///*
+float Gate12Area[4]={0.0, 936.52, 2000.0, 2558.54};
+float Gate23Area[4]={0.0, 2100.0, 2558.54, 3800.0};
+float Gate34Area[4]={936.52, 2100.0, 2497.44, 2558.54};
+float Gate45Area[4]={936.52, 1614.4, 1290.24, 2497.44};
+float Gate56Area[4]={936.52, 1614.4, 0.0, 1290.24};
+float Gate67Area[4]={1614.4, 2255.65, 0.0, 2497.44};
+float Gate78Area[4]={2255.65, 3202.03, 0.0, 2497.44};
+float Gate89Area[4]={3202.03, 4200.0, 0.0, 2497.44};
+//*/
