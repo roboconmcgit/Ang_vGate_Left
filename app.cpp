@@ -97,6 +97,11 @@ static float log_fdat_02[10000];
 
 //System Initialization
 static void sys_initialize() {
+  
+  int  battery;
+  char battery_str[32];
+  int  gyro;
+  char gyro_str[32];
 
   // [TODO] タッチセンサの初期化に2msのdelayがあるため、ここで待つ
   tslp_tsk(2);
@@ -120,22 +125,48 @@ static void sys_initialize() {
 
   ev3_speaker_set_volume(5);
   ev3_speaker_play_tone(NOTE_C4,200);
+  
+  battery = ev3_battery_voltage_mV();
+  sprintf(battery_str, "Battery:%d", battery);
+
   ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
-  ev3_lcd_draw_string("Set the robot on the Ground",0, CALIB_FONT_HEIGHT*1);
-  ev3_lcd_draw_string("Touch the T-Sensor for reset sensors",0, CALIB_FONT_HEIGHT*2);
+  ev3_lcd_set_font(EV3_FONT_MEDIUM);
+  ev3_lcd_draw_string("Left vGATE",0, 20);
+
+  ev3_lcd_draw_string(battery_str,0, 40);
+  ev3_lcd_draw_string("Set ANG on GND",0, 60);
+  ev3_lcd_draw_string("PUSH TS 4 RESET",0, 80);
 
   while(1){
     if (gTouchSensor.isPressed()){
+      gAng_Eye->init();   //reset gyro
+      gAng_Robo->init();  //
+      gAng_Brain->init(); //initialize mode
       break; /* タッチセンサが押された */
     }
+    gyro = gGyroSensor.getAnglerVelocity();  // ジャイロセンサ値
+    sprintf(gyro_str, "Gyro:%d", gyro);
+    ev3_lcd_draw_string(gyro_str,0, 100);
     tslp_tsk(10); //What dose it mean? kota 170812
   }
   ev3_speaker_play_tone(NOTE_E4,200);
   ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
 
-  gAng_Eye->init();   //reset gyro
-  gAng_Robo->init();  //
-  gAng_Brain->init(); //initialize mode
+  tslp_tsk(500);
+
+  while(1){
+    if (gTouchSensor.isPressed()){
+      break; /* タッチセンサが押された */
+    }
+    gyro = gGyroSensor.getAnglerVelocity();  // ジャイロセンサ値
+    sprintf(gyro_str, "Gyro:%d", gyro);
+    ev3_lcd_draw_string(gyro_str,0, 100);
+    tslp_tsk(20); //What dose it mean? kota 170812
+    ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
+  }
+  ev3_speaker_play_tone(NOTE_E4,200);
+  ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
+
 
   /* Open Bluetooth file */
   bt = ev3_serial_open_file(EV3_SERIAL_BT);
@@ -145,11 +176,9 @@ static void sys_initialize() {
   act_tsk(BT_TASK);
 
   // 初期化完了通知
-  ev3_led_set_color(LED_ORANGE);
+  ev3_led_set_color(LED_OFF);
 
   ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
-  msg_f("Selected APP is Line Trace Only ", 1);
-  msg_f("Sys_Mode = SYS_INIT", 2);
   ev3_speaker_play_tone(NOTE_C4,200);
 }
 
@@ -217,6 +246,7 @@ static void color_sensor_calibration(){
   ev3_speaker_play_tone(NOTE_E4,200);
   tslp_tsk(150);
   ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
+  ev3_lcd_set_font(EV3_FONT_SMALL);
   ev3_lcd_draw_string("Calib BLACK", 0, CALIB_FONT_HEIGHT*1);
 
   while(1){
@@ -363,9 +393,6 @@ static void color_sensor_calibration(){
   sprintf(s,"WHITE_SLANT : %2d",white_slant);
   ev3_lcd_draw_string(s, 0, CALIB_FONT_HEIGHT*4);
 #endif
-  sprintf(s,"Set the robot on the Start Line");
-  ev3_lcd_draw_string(s, 0, CALIB_FONT_HEIGHT*5);
-
   ev3_speaker_play_tone(NOTE_A4,200);
   tslp_tsk(150);
   ev3_speaker_play_tone(NOTE_C5,200);
@@ -380,19 +407,24 @@ static void color_sensor_calibration(){
 //*****************************************************************************
 void bt_task(intptr_t unused)
 {
-    while(1){
-      uint8_t c = fgetc(bt); /* 受信 */
-      switch(c){
-      case '1':
-	bt_cmd = 1;
-	//msg_f("Bluetooth is connected", 2);
-	break;
-      default:
-	//msg_f("Bluetooth is un-connected", 2);
-	break;
-      }
-      fputc(c, bt); /* エコーバック */
+  while(1){
+    uint8_t c = fgetc(bt); /* 受信 */
+    switch(c){
+    case '1':
+      bt_cmd = 1;
+      break;
+
+    case '0':
+      ev3_speaker_play_tone(NOTE_C4,200);
+      ev3_led_set_color(LED_GREEN);
+      break;
+
+    default:
+      ev3_led_set_color(LED_OFF);
+      break;
     }
+    fputc(c, bt); /* エコーバック */
+  }
 }
 
 //Anago Eye Task
@@ -503,8 +535,17 @@ void main_task(intptr_t unused) {
   ev3_sta_cyc(EYE_CYC);
   ev3_sta_cyc(BRAIN_CYC);
 
-  //170812 Copy from sample program of ET Robocon
+  ev3_lcd_set_font(EV3_FONT_MEDIUM);
+  ev3_lcd_draw_string("Set ANG on Start Line",0, 40);
+  ev3_lcd_draw_string("PRESS TS or 1",0, 80);
   while(1){
+
+    if(ev3_bluetooth_is_connected()){
+      ev3_lcd_draw_string("BT connected",0, 60);
+    }else{
+      ev3_lcd_draw_string("BT unconnected",0, 60);
+    }
+
     if (bt_cmd == 1){
       break; /* リモートスタート */
     }
@@ -513,7 +554,8 @@ void main_task(intptr_t unused) {
     }
     tslp_tsk(10); //What dose it mean? kota 170812
   }
-  ev3_led_set_color(LED_GREEN); /* スタート通知 */
+  ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
+  ev3_led_set_color(LED_OFF);
   mSys_Mode=START;
 
   //Start Dash sequence from here to robo_task.  
@@ -535,6 +577,7 @@ void main_task(intptr_t unused) {
   gTailMotor.~Motor();
 
   ev3_led_set_color(LED_ORANGE);
+  ev3_lcd_set_font(EV3_FONT_SMALL);
   ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
   ev3_lcd_draw_string("Stop",0, CALIB_FONT_HEIGHT*1);
 
@@ -549,7 +592,7 @@ void main_task(intptr_t unused) {
   gAng_Eye->export_dat( );
   ev3_lcd_draw_string("Saving Log Data is done",0, CALIB_FONT_HEIGHT*3);
 #endif
-
+  ev3_led_set_color(LED_OFF);
 
   sys_destroy();
   ext_tsk();

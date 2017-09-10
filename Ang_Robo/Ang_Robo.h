@@ -41,15 +41,26 @@ public:
    //170816 ota add tail control
     void tail_reset();
     void tail_stand_up(); //tail for gyro reset and color sensor calibration
-    
+
+    void tail_stand_from_balance();
+
     void exportRobo(char *csv_header);
     void saveData(int idata_num);
-    
-    bool balance_mode;
+
+    int   offset;    
+    bool  balance_mode;
     int   mmForward;
     int   mmTurn;
     float mmYawratecmd;//目標Yawrate
     float mmYawrate;
+    int   log_forward;
+    int   log_turn;
+    int   log_gyro;
+    int   log_left_wheel_enc;
+    int   log_right_wheel_enc;
+    int   log_battery;
+    int   log_left_pwm;
+    int   log_right_pwm;
 
 private:
     const ev3api::GyroSensor& mGyroSensor;
@@ -58,6 +69,19 @@ private:
     ev3api::Motor& mTail_Motor;
     Balancer* mBalancer;
     PID *gTail_pwm = new PID();
+
+
+    enum enumStand_Mode{
+      Balance_Mode,
+      Tail_Down,
+      Tail_On,
+      Tail_Stand,
+      Stand_Vert,
+      Stand_to_Balance,
+      Tail_for_Run,
+      Debug_00
+    };
+    enumStand_Mode  Stand_Mode;
 
     int   mForward;
     float mTurn;
@@ -131,7 +155,10 @@ private:
 
     void TailMode(int mForward, float mTurn); //PWM Gen. without Balancer task 0814
     int mtail_mode_pwm_l;
-	int mtail_mode_pwm_r;
+    int mtail_mode_pwm_r;
+
+    bool balance_off_en;
+    bool pre_balancer_on;
 
 #ifdef DEBUG_ROBO
     dequefloat> dsave_log1;

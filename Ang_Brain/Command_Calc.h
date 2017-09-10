@@ -21,7 +21,6 @@ public:
 			    float odo,                
 			    float speed,
                             float yawrate,
-//                            float yawangle,
                             float abs_angle,
 			    int   robo_tail_angle,
 			    bool  robo_stop,
@@ -98,7 +97,9 @@ private:
       None=539
     };
     
+    
     enum enumTrack_Mode{
+      Start_to_1st_Straight,
       Start_to_1st_Corner,
       Fst_Corner,
       Snd_Corner,
@@ -109,7 +110,12 @@ private:
       Return_to_Line,
       Go_Step,
       Approach_to_Garage,
-      Stop_Robo
+      Return_to_Line_Garage,
+      Garage_In,
+      Stop_Robo,
+      Track_Debug_00,
+      Track_Debug_01,
+      Track_Debug_02
     };
 
     enum enumStep_Mode{
@@ -121,21 +127,22 @@ private:
       First_Dansa_On,
       First_Dansa_Tail_On,
       First_Turn,
+      First_Pre_Stand_Up,
       First_Dansa_Stand_Up,
       Approach_to_2nd_Step,
       Second_Dansa,
       Second_Dansa_On,
       Second_Dansa_Tail_On,
       Second_Turn,
+      Second_Pre_Stand_Up,
       Second_Dansa_Stand_Up,
       Approach_to_Exit,
 
       Change_Left_Edge_Trace,
       Left_edge_On,
-      End
+      End_of_Step
     };
-
-
+    
     enumStrategy    Strategy;
     enumVirtualGate VirtualGate;
     enumTrack_Mode  Track_Mode;

@@ -7,6 +7,9 @@ using ev3api::Clock;
 
 #define liting_radius 10; // liting spot radius [mm]
 //#define STEP_DEBUG
+//#define GARAGE_DEBUG
+//#define BALANCE_DEBUG
+
 
 Clock*       gClock;
 
@@ -15,14 +18,19 @@ CommandCalc::CommandCalc(){
 }
 
 void CommandCalc::init( ){
-
-  Track_Mode = Start_to_1st_Corner;
-#ifdef STEP_DEBUG
-  Track_Mode = Return_to_Line;
-  //  Track_Mode = Go_Step;
-#endif
-  Step_Mode  = Step_Start;
   gClock       = new Clock();
+  Track_Mode = Start_to_1st_Corner;
+  Step_Mode  = Step_Start;
+
+#ifdef STEP_DEBUG
+  //Track_Mode = Return_to_Line;
+  Track_Mode = Go_Step;
+#endif
+
+#ifdef BALANCE_DEBUG
+  //Track_Mode = Return_to_Line;
+  Track_Mode =  Track_Debug_00;
+#endif
 }
 
 void CommandCalc::SetCurrentData(int   linevalue,
@@ -31,7 +39,7 @@ void CommandCalc::SetCurrentData(int   linevalue,
 				 float odo,                     
 				 float speed,
 				 float yawrate,
-				 float yawangle,
+				 float abs_angle,
 				 int   robo_tail_angle,
 				 bool  robo_stop,
 				 bool  robo_forward,
@@ -52,7 +60,7 @@ void CommandCalc::SetCurrentData(int   linevalue,
     mOdo               = odo;
     mSpeed             = speed;
     mYawrate           = yawrate;
-    mYawangle          = yawangle;
+    mYawangle          = abs_angle;
     mTail_angle        = robo_tail_angle;
     mRobo_stop         = robo_stop;
     mRobo_forward      = robo_forward;
@@ -70,8 +78,9 @@ void CommandCalc::SetCurrentData(int   linevalue,
 
 void CommandCalc::Track_run( ) {
 
-  static float ref_odo;
-  int dammy_line_value;
+  static float   ref_odo;
+  static int32_t clock_start;
+  int            dammy_line_value;
 
   switch(Track_Mode){
 
@@ -111,6 +120,8 @@ void CommandCalc::Track_run( ) {
 
   case Final_Straight:
     forward =  mMax_Forward;
+    mMax_Yawrate = 1.0;
+    mMin_Yawrate = -1.0;
     LineTracerYawrate(mLinevalue);
     anglecommand = TAIL_ANGLE_RUN; //0817 tada
     tail_mode_lflag = false;
@@ -119,10 +130,9 @@ void CommandCalc::Track_run( ) {
       Track_Mode = Dead_Zone;
       ref_odo = mOdo + DEAD_ZONE_LENGTH;
     }
-
     break;
 
-    case Get_Ref_Odo:
+  case Get_Ref_Odo:
     forward =  50;
     dammy_line_value = 50 - 300*mYawangle;
     if(dammy_line_value > 100){
@@ -133,11 +143,11 @@ void CommandCalc::Track_run( ) {
 
     LineTracerYawrate(dammy_line_value);
     ref_odo = mOdo + DEAD_ZONE_LENGTH;
-  	Track_Mode = Dead_Zone;
-
+    Track_Mode = Dead_Zone;
+    
     break;
 
-  	case Dead_Zone:
+  case Dead_Zone:
     forward =  50;
     dammy_line_value = 50 - 300*mYawangle;
     if(dammy_line_value > 100){
@@ -183,22 +193,73 @@ void CommandCalc::Track_run( ) {
     break;
 
   case Approach_to_Garage:
-    if(mOdo > ref_odo){
-      forward =  0;
-      yawratecmd = 0;						//目標yawrate値を更新
-    }
-    forward =  20;
-    dammy_line_value = 50 - 300*(mYawangle-PAI);
-    if(dammy_line_value > 100){
-      dammy_line_value = 100;
-    }else if(dammy_line_value < 0){
-      dammy_line_value = 0;
-    }
 
-    LineTracerYawrate(dammy_line_value);
+    ref_odo = mOdo + STEP_TO_GARAGE_LENGTH;
+    y_t = -0.5*((FIVE_PAI) - mYawangle);
+    
+    yawratecmd = y_t;
+
+    gStep->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
+    forward = 0.1*(gStep->CalcPIDContrInput(ref_odo, mOdo));
+    
+    anglecommand = TAIL_ANGLE_RUN;
+    Track_Mode = Garage_In;
+
+    break;
+    
+  case Return_to_Line_Garage:
+    forward =  50;
+    LineTracerYawrate((4*mLinevalue));
+    anglecommand = TAIL_ANGLE_RUN; //0817 tada
+    tail_mode_lflag = false;
+    /*
+    if((mOdo > 300)&&(mDet_gray)){
+      Track_Mode = Garage_In;
+      ref_odo = mOdo + GRAY_TO_GARAGE_LENGTH;
+      }*/
+    break;
+
+  case Garage_In:
+
+
+
+    y_t = -0.5*((FIVE_PAI+RAD_1_DEG) - mYawangle);
+    yawratecmd = y_t;
+    forward = 0.3*(gStep->CalcPIDContrInput(ref_odo, mOdo));
+    anglecommand = TAIL_ANGLE_RUN;
+
 
     break;
 
+  case Track_Debug_00:
+    ref_odo = 0;
+
+    anglecommand = TAIL_ANGLE_RUN;
+    tail_mode_lflag = false;
+    clock_start = gClock->now();
+    Track_Mode = Track_Debug_01;
+    break;
+
+  case Track_Debug_01:
+
+    if(gClock->now() - clock_start > 5000){
+      tail_mode_lflag = true;
+    }
+    if(mRobo_balance_mode == false){
+      clock_start = gClock->now();
+      Track_Mode = Track_Debug_02;
+    }
+    break;
+
+  case Track_Debug_02:
+    anglecommand = TAIL_ANGLE_RUN;
+    if(gClock->now() - clock_start > 3000){
+      tail_mode_lflag = false;
+    }
+    if(mRobo_balance_mode == true){
+      Track_Mode = Track_Debug_00;
+    }
+    break;
 
   default:
     forward = 0;
@@ -631,8 +692,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   float y_t;
   static float angle_change_right_edge_trace;
-  static float angle_change_left_edge_trace;
-  
   static float target_odo;
   static float target_angle;
   static float target_tail_angle;
@@ -650,9 +709,12 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     anglecommand = TAIL_ANGLE_RUN; //0817 tada
     
     Step_Mode = Approach_to_Step;   
-    //debug for stand_up
-    //  Step_Mode =  First_Dansa;   
-    //    target_odo = odo + 250; //for debug
+
+#ifdef STEP_DEBUG
+    Step_Mode   =  First_Dansa;   
+    target_odo  = odo + 250; //for debug
+    clock_start = gClock->now();
+#endif
 
     break;
 
@@ -664,42 +726,16 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       forward =  50;
     }
 
-      LineTracerYawrate((2*line_value));
-
-
+    LineTracerYawrate((2*line_value));
+    if((angle >  RAD_90_DEG)&&(yawratecmd < 0) ){
+      yawratecmd = 0.0;
+    }
     if(dansa){
       Step_Mode = First_Dansa;
-      target_odo = odo + 250;
+      target_odo = odo + FST_DANSA_POS;
     }
 
 
-    break;
-
-  case Change_Right_Edge_Trace:
-    if(angle < (angle_change_right_edge_trace - (PAI/4.0))){
-      Step_Mode = Right_Edge_On;
-    }
-    else{
-      y_t = 0.5*(angle - (angle_change_right_edge_trace - (PAI/4.0)));
-      forward = 0;
-      yawratecmd = y_t;						//目標yawrate値を更新
-      //      yawratecmd = -1.0;						//目標yawrate値を更新
-    }
-    break;
-
-  case Right_Edge_On:
-    if(dansa){
-      Step_Mode = First_Dansa;
-      target_odo = odo + 250;
-    }
-    else{
-      y_t = (((float)line_value-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
-      if(y_t > 10.0) y_t = 10.0;
-      if(y_t < -10.0) y_t = -10.0;
-  
-      yawratecmd = y_t/6.0;						//目標yawrate値を更新
-      forward = 10;
-    }
     break;
 
   case First_Dansa:
@@ -713,20 +749,17 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }else{
       forward    = 20;
       yawratecmd = 0;
-
     }
     break;
 
   case First_Dansa_On:
-    //    gStep->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
+
     forward = gStep->CalcPIDContrInput(target_odo, odo);
     forward = forward * 0.1;
     yawratecmd = 0;
     anglecommand = target_tail_angle;
 
-    if(target_tail_angle < TAIL_ANGLE_DANSA){
-      target_tail_angle = target_tail_angle + 0.1;
-    }
+
     if((gClock->now() - clock_start) > 5000){
       Step_Mode = First_Dansa_Tail_On;
       clock_start = gClock->now();
@@ -735,88 +768,112 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
   break;
 
   case First_Dansa_Tail_On:
-    forward = -10;
+
+    tail_mode_lflag = true;
+    forward    = 0;
     yawratecmd = 0;
-    if((gClock->now() - clock_start) > 2000){
-      forward = 0;
+    if(mRobo_balance_mode == false){
+      forward    = 0;
       yawratecmd = 0;
-      tail_mode_lflag = true;
       Step_Mode = First_Turn;
       clock_start = gClock->now();
-      target_angle = angle + RAD_360_DEG;
+      target_angle = angle + RAD_360_DEG + RAD_15_DEG;
+    }
+
+#ifdef STEP_DEBUG
+    
+#endif
+
+    break;
+
+  case First_Turn:
+    tail_mode_lflag = true;
+    if(angle >= target_angle){
+      //      Step_Mode = First_Dansa_Stand_Up;
+      Step_Mode = First_Pre_Stand_Up;
+      clock_start = gClock->now();
+      forward = 0;
+      yawratecmd = 0;
+    }else{
+      forward = 0;
+      y_t = -2.0;
+      yawratecmd = y_t;
+    }						//目標yawrate値を更新
+    break;
+
+  case First_Pre_Stand_Up:
+    
+    forward = 10;
+    y_t = -0.5*(2.5*PAI - angle);
+    yawratecmd = y_t;
+    tail_mode_lflag = true;
+
+    if((gClock->now() - clock_start) > 1500){
+      forward    = 0;
+      yawratecmd = 0;
+      tail_mode_lflag = true;
+      clock_start = gClock->now();
+      Step_Mode = First_Dansa_Stand_Up;
     }
     
     break;
 
-  case First_Turn:
-    if((gClock->now() - clock_start) > 1000){
-      if(angle >= target_angle){
-	Step_Mode = First_Dansa_Stand_Up;
-	clock_start = gClock->now();
-	forward = 0;
-	yawratecmd = 0;
-	
-      }else{
-	forward = 0;
-	//      y_t = -0.5*(target_angle - angle);
-	y_t = -1.5;
-	yawratecmd = y_t;						//目標yawrate値を更新
-      }						//目標yawrate値を更新
-    }
-    else{
-      forward = 0;
-      yawratecmd = 0;
-    }
-    break;
-
   case First_Dansa_Stand_Up:
-    if((gClock->now() - clock_start) > 1000){
 
-      if(mTail_angle > 98){	
-	forward = 0;
+    if((gClock->now() - clock_start) > 3000){
+
+      forward    = 0;
+      yawratecmd = 0;
+
+      anglecommand = TAIL_ANGLE_RUN;
+      tail_mode_lflag = false;
+      if(mRobo_balance_mode == true){
+	forward    = 0;
 	yawratecmd = 0;
-	tail_mode_lflag = false;
 	anglecommand = TAIL_ANGLE_RUN;
 	Step_Mode = Approach_to_2nd_Step;
 	clock_start = gClock->now();
-      }else if(target_tail_angle < 120){
-	target_tail_angle = target_tail_angle + 0.01;
-	anglecommand = target_tail_angle;
       }
-
-
     }else{
-      forward = 0;
+      tail_mode_lflag = true;
+      forward    = 0;
       yawratecmd = 0;
     }
-  
+#ifdef STEP_DEBUG
+
+#endif
     break;
 
   case Approach_to_2nd_Step:
     
 
     if((gClock->now() - clock_start) < 5000){
-      forward = 0;
-      yawratecmd = 0.0;
+      forward    = 0;
+      yawratecmd = 0;
       anglecommand = TAIL_ANGLE_RUN;
     }else{
       forward = 10;
-      y_t = (-1.0)*(((float)line_value-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
-      if(y_t > 10.0) y_t = 10.0;
-      if(y_t < -10.0) y_t = -10.0;
-      yawratecmd = y_t/6.0;						//目標yawrate値を更新
+
+      y_t = -0.5*(2.5*PAI - angle);
+#ifdef STEP_DEBUG
+      //      y_t = -0.5*(2.0*PAI - angle);
+#endif
+      yawratecmd = y_t;
+
 
       if(dansa){
+	forward    = 10;
+	yawratecmd = 0;
 	Step_Mode = Second_Dansa;
-	target_odo = odo + 250;
+	target_odo = odo + SCD_DANSA_POS;
       }
     }
 
     break;
     
   case Second_Dansa:
-    if(odo > target_odo){
-      forward = 0;
+   if(odo > target_odo){
+      forward    = 0;
       yawratecmd = 0;
       target_tail_angle =  TAIL_ANGLE_RUN;
       clock_start = gClock->now();
@@ -835,43 +892,49 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     yawratecmd = 0;
     anglecommand = target_tail_angle;
 
-    if(target_tail_angle < TAIL_ANGLE_DANSA){
+    /*    if(target_tail_angle < TAIL_ANGLE_DANSA){
       target_tail_angle = target_tail_angle + 0.1;
-    }
+      target_tail_angle = target_tail_angle + 0.2;
+
+      }*/
+
     if((gClock->now() - clock_start) > 5000){
       Step_Mode = Second_Dansa_Tail_On;
       clock_start = gClock->now();
+      forward    = 0;
+      yawratecmd = 0;
     }
 
   break;
 
   case Second_Dansa_Tail_On:
-    forward = -10;
+    forward    = 0;
     yawratecmd = 0;
-    if((gClock->now() - clock_start) > 2000){
-      forward = 0;
+    tail_mode_lflag = true;
+    if(mRobo_balance_mode == false){
+      forward    = 0;
       yawratecmd = 0;
       tail_mode_lflag = true;
       Step_Mode = Second_Turn;
       clock_start = gClock->now();
-      //      target_angle = angle + RAD_360_DEG;
-      target_angle = angle + RAD_450_DEG;
+      target_angle = angle + RAD_450_DEG + RAD_5_DEG;
     }
-    
     break;
 
   case Second_Turn:
+    tail_mode_lflag = true;
     if((gClock->now() - clock_start) > 1000){
       if(angle >= target_angle){
-	Step_Mode = Second_Dansa_Stand_Up;
+	//Step_Mode = Second_Dansa_Stand_Up;
+	Step_Mode = Second_Pre_Stand_Up;
 	target_odo = odo + 50;
 	clock_start = gClock->now();
-	forward = 0;
+	forward    = 0;
 	yawratecmd = 0;
 	
       }else{
 	forward = 0;
-	y_t = -0.5;
+	y_t     = -2.0;
 	yawratecmd = y_t;						//目標yawrate値を更新
       }						//目標yawrate値を更新
     }
@@ -881,77 +944,106 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     break;
 
+  case Second_Pre_Stand_Up:
+    
+    forward = 10;
+    y_t = -0.5*(5*PAI - angle);
+    yawratecmd = y_t;
+    tail_mode_lflag = true;
+
+    if((gClock->now() - clock_start) > 1500){
+      forward    = 0;
+      yawratecmd = 0;
+      tail_mode_lflag = true;
+      clock_start = gClock->now();
+      Step_Mode = Second_Dansa_Stand_Up;
+    }
+    
+    break;
+
+
   case Second_Dansa_Stand_Up:
-    if((gClock->now() - clock_start) > 1000){
 
-      if(mTail_angle > 98){	
-	forward = 0;
+    if((gClock->now() - clock_start) > 15000){
+      forward    = 0;
+      yawratecmd = 0;
+      anglecommand = TAIL_ANGLE_RUN;
+      Step_Mode = Approach_to_Exit;
+      clock_start = gClock->now();
+      tail_mode_lflag = false;
+    }
+
+    if((gClock->now() - clock_start) > 3000){
+      forward    = 0;
+      yawratecmd = 0;
+
+      anglecommand = TAIL_ANGLE_RUN;
+      tail_mode_lflag = false;
+
+      if(mRobo_balance_mode == true){
+	forward    = 0;
 	yawratecmd = 0;
-	tail_mode_lflag = false;
 	anglecommand = TAIL_ANGLE_RUN;
-	Step_Mode = Approach_to_Exit;  
+	Step_Mode = Approach_to_Exit;
 	clock_start = gClock->now();
-      }else if(target_tail_angle < 120){
-	forward = 0;
-	target_tail_angle = target_tail_angle + 0.01;
-	anglecommand = target_tail_angle;
+
+#ifdef STEP_DEBUG
+	//    Step_Mode =  First_Dansa;   
+	//    target_odo = odo + 250; //for debug
+	//    clock_start = gClock->now();
+#endif
+
       }
-
-
-
-
-
     }else{
       forward = 0;
       yawratecmd = 0;
+      tail_mode_lflag = true;
     }
 
 
     break;
 
   case Approach_to_Exit:
-       
-    /*
-    y_t = (((float)line_value-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
-    if(y_t > 10.0) y_t = 10.0;
-    if(y_t < -10.0) y_t = -10.0;
-    yawratecmd = y_t/6.0;						//目標yawrate値を更新
-    */
-    if((gClock->now() - clock_start) < 5000){
-      forward = 0;
-      yawratecmd = 0;						//目標yawrate値を更新
-    }else{
-      forward = 10;
-      if(dansa){
-	Track_Mode = Approach_to_Garage;
-      }
-    }
-    break;
 
+    forward    = 20;
+
+    y_t = -0.5*(5*PAI - angle);
+#ifdef STEP_DEBUG
+    //    y_t = -0.5*(4.5*PAI - angle);
+#endif
+
+    yawratecmd = y_t;
+
+
+    if(dansa){
+      forward    = 20;
+      yawratecmd = 0;
+      Track_Mode = Approach_to_Garage;
+    }
+    if(mOdo > target_odo){
+      forward    = 20;
+      yawratecmd = 0;
+      Track_Mode = Approach_to_Garage;
+    }
+
+
+    break;
 
   case Change_Left_Edge_Trace:
-    if(angle > (angle_change_left_edge_trace + (PAI/4.0))){
-      Step_Mode = End;
-    }
-    else{
-      y_t = -0.5*((angle_change_left_edge_trace - (PAI/4.0))-angle);
-      forward = 0;
-      yawratecmd = y_t;						//目標yawrate値を更新
-      //      yawratecmd = -1.0;						//目標yawrate値を更新
-    }
+
     break;
+
+  case End_of_Step:
+
+    break;
+
+
 
   default:
-    y_t = -1.0*(((float)line_value-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
-    if(y_t > 10.0) y_t = 10.0;
-    if(y_t < -10.0) y_t = -10.0;
-  
-    yawratecmd = y_t/6.0;						//目標yawrate値を更新
-    forward = 20;
-    
+    yawratecmd = 0;
+    forward = 0;
     break;
   }
-
 }
 
 void CommandCalc::LookUpGateRunner(){

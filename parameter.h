@@ -10,20 +10,34 @@ extern "C" {
 #endif
 */
 
+//Parameter of Robo
 extern int TAIL_ANGLE_STAND_UP;  /* 完全停止時の角度[度] */
 extern int TAIL_ANGLE_RUN;     /* バランス走行時の角度[度] */
 extern int TAIL_ANGLE_DANSA; /* 完全停止時の角度[度] */
 extern int TAIL_ANGLE_LUG; /* 3点移動時の角度[度] */
 extern int TAIL_ANGLE_GARAGE; /* 完全停止時の角度[度] */
 
+extern float WheelDiameter; //背面から見てタイヤの直径[mm]
+extern float WHEEL_R;       //radius of wheel[mm]
+extern int   RoboTread;      //トレッド長さ[mm]
+
+//Parameter of time length unit
 extern float dT_100ms;
 extern float dT_4ms;
 
 extern float PAI;
+extern float FIVE_PAI;
+
 extern float RAD_315_DEG;
 extern float RAD_1_DEG; //deg@1rad 
 extern float RAD_5_DEG; //
+extern float RAD_15_DEG; //deg@1rad 
+extern float RAD_30_DEG; //
+
 extern float MINUS_RAD_5_DEG; //
+extern float MINUS_RAD_15_DEG; //
+extern float MINUS_RAD_30_DEG; //
+
 extern float RAD_90_DEG;
 extern float RAD_120_DEG;
 extern float RAD_315_DEG;
@@ -31,16 +45,15 @@ extern float RAD_345_DEG;
 extern float RAD_360_DEG;
 extern float RAD_450_DEG;
 
-extern float WheelDiameter; //背面から見てタイヤの直径[mm]
-extern float WHEEL_R;       //radius of wheel[mm]
-extern int   RoboTread;      //トレッド長さ[mm]
-
+//Parameter of Course
 extern float FINAL_STRAIGHT_LENGTH;
 extern float DEAD_ZONE_LENGTH;
+extern float FST_DANSA_POS;
+extern float SCD_DANSA_POS;
 extern float STEP_TO_GARAGE_LENGTH;
 
-//Strategy_Det.o
 
+//Parameter of Area
 extern float LineTrace1Area[4];
 extern float MapTraceArea1[4];
 extern float MapTraceArea2[4];
