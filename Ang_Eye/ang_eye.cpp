@@ -126,6 +126,7 @@ void Ang_Eye::WheelOdometry(float dT) {
 //      xvalue = 0.0;
     	xvalue = 735.96;
 //      yvalue = 1505;
+    	yvalue = 415.74 + odo * sin(angle_ave_dat);//0910 tada
 
       enum_Mode = DET_MOVEMENT;
       angle_sum_dat = 0;

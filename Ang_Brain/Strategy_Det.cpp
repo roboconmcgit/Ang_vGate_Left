@@ -128,6 +128,8 @@ void StrategyDet::RunningStrategyDet(float x_value, float y_value, float yawangl
     Max_Forward = 100;
     Max_Yawrate = 3.0;
     Min_Yawrate = -3.0;
+    Max_Yawrate = 0.20;
+    Min_Yawrate = -0.20;
   }
 /*
   else if(Robo_Area_Estimator(StepArea[0],StepArea[1],StepArea[2],StepArea[3],x_value,y_value,yawangle)){

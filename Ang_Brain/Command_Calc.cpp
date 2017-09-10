@@ -123,8 +123,18 @@ void CommandCalc::Track_run( ) {
     break;
 
   case Get_Ref_Odo:
+    case Get_Ref_Odo:
     forward =  50;
       ref_odo = mOdo + DEAD_ZONE_LENGTH;
+    dammy_line_value = 50 - 300*mYawangle;
+    if(dammy_line_value > 100){
+      dammy_line_value = 100;
+    }else if(dammy_line_value < 0){
+      dammy_line_value = 0;
+    }
+
+    LineTracerYawrate(dammy_line_value);
+    ref_odo = mOdo + DEAD_ZONE_LENGTH;
   	Track_Mode = Dead_Zone;
 
     break;
@@ -148,6 +158,20 @@ void CommandCalc::Track_run( ) {
   case Return_to_Line:
     forward =  50;
     LineTracerYawrate((2*mLinevalue));
+//    forward =  50; // 0910 tada
+    forward =  20; // 0910 tada
+  	if(mYawangle < 0.16 && mLinevalue <20){
+	    dammy_line_value = 80 - 300*mYawangle;
+	    if(dammy_line_value > 100){
+		dammy_line_value = 100;
+	    }else if(dammy_line_value < 0){
+	      dammy_line_value = 0;
+	    }
+	    LineTracerYawrate(dammy_line_value);
+  	}
+  	else{
+  		LineTracerYawrate(mLinevalue);
+  	}
     anglecommand = TAIL_ANGLE_RUN; //0817 tada
     tail_mode_lflag = false;
 
@@ -259,8 +283,15 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 	case MapTrace8:
 		forward = 100; //0827 tada
 		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		if(mLinevalue > 20){
+			LineTracerYawrate(mLinevalue);
+		}
+		else{
+			MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+		}
 		anglecommand = TAIL_ANGLE_RUN; //0827 tada
 		tail_mode_lflag = false; //0827 tada
+		Track_Mode = Get_Ref_Odo;//0910 tada
 	break;
 
 	case Goal:
@@ -373,6 +404,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_C3[3]={3024.44,790.66,1009.34};
 	float Virtual_S4[4]={3024.44,1800,4613.06,1800};
 */
+	/*ライン（安）１
 	float Virtual_S1[4]={735.96,415.74,735.96, 2558.54};
 	float Virtual_C1[3]={1083.86,2558.54,347.9};
 	float Virtual_S2[4]={1426.36,2494.88,1210.99,1290.24};
@@ -382,6 +414,18 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 //	float Virtual_S4[4]={3294.63,1880.0,4600.0,1880.0};
 	float Virtual_S4[4]={3294.63,1880.0,4600.0,2100.0};
 
+	float Virtual_C3[3]={3302.03,349.04,1530.96};
+	float Virtual_S4[4]={3302.03,1880.0,4600.0,2050.0};
+	*/
+///*
+	float Virtual_S1[4]={735.96,415.74,735.96, 2558.54};
+	float Virtual_C1[3]={1083.86,2558.54,347.9};
+	float Virtual_S2[4]={1426.36,2494.88,1210.99,1290.24};
+	float Virtual_C2[3]={1458.8,1246.03,251.72};
+	float Virtual_S3[4]={1614.4,1048.17,2255.65,1552.45};
+	float Virtual_C3[3]={3202.03,349.04,1530.96};
+	float Virtual_S4[4]={3202.03,1880.0,4600.0,2050.0};
+//*/
 	float extend_gain = 1.0;
 	float Virtual_point_dist = 50.0;
 	
