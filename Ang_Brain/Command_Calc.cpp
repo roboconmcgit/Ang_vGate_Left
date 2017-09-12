@@ -197,10 +197,7 @@ void CommandCalc::Track_run( ) {
 
   case Approach_to_Garage:
 
-    forward    = 0;
-    yawratecmd = 0;
-    anglecommand = TAIL_ANGLE_RUN;
-    /*
+
     ref_odo = mOdo + STEP_TO_GARAGE_LENGTH;
 
     y_t = -0.5*((FIVE_PAI) - mYawangle);
@@ -211,7 +208,7 @@ void CommandCalc::Track_run( ) {
     
     anglecommand = TAIL_ANGLE_RUN;
     Track_Mode = Go_to_Garage;
-    */
+
     break;
     
   case Go_to_Garage:
@@ -228,7 +225,7 @@ void CommandCalc::Track_run( ) {
     forward = 0.3*(gStep->CalcPIDContrInput(ref_odo, mOdo));
     anglecommand = TAIL_ANGLE_RUN;
 
-    if(mOdo == ref_odo){
+    if(mOdo >= ref_odo){
       Track_Mode = Garage_Tail_On;
     }
     break;
@@ -977,21 +974,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       }
     }
   
-
-
-    /*
-   if(odo > target_odo - 50){
-      forward    = 0;
-      yawratecmd = 0;
-      target_tail_angle =  TAIL_ANGLE_RUN;
-      clock_start = gClock->now();
-      Step_Mode = Second_Dansa_On;
-    }else{
-      forward    =  STEP_CLIMB_SPPED;
-      yawratecmd = 0;
-    }
-    */
-
     break;
 
 
@@ -1001,12 +983,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     forward = forward * 0.5;
     yawratecmd = 0;
     anglecommand = target_tail_angle;
-
-    /*    if(target_tail_angle < TAIL_ANGLE_DANSA){
-      target_tail_angle = target_tail_angle + 0.1;
-      target_tail_angle = target_tail_angle + 0.2;
-
-      }*/
 
     if((gClock->now() - clock_start) > 5000){
       Step_Mode = Second_Dansa_Tail_On;
@@ -1027,7 +1003,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       tail_mode_lflag = true;
       Step_Mode = Second_Turn;
       clock_start = gClock->now();
-      target_angle = angle + RAD_450_DEG + RAD_5_DEG;
+      target_angle = angle + RAD_450_DEG + RAD_15_DEG;
     }
     break;
 
@@ -1055,11 +1031,14 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
   case Second_Pre_Stand_Up:
     
     forward = 10;
-    y_t = -0.5*(5*PAI - angle);
+    y_t = -10.0*(5*PAI - angle);
     yawratecmd = y_t;
     tail_mode_lflag = true;
 
-    if((gClock->now() - clock_start) > 1500){
+    //    if((gClock->now() - clock_start) > 1500){
+    if((gClock->now() - clock_start) > 2500){
+      //    if((gClock->now() - clock_start) > 2500){
+
       forward    = 0;
       yawratecmd = 0;
       tail_mode_lflag = true;

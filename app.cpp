@@ -93,7 +93,7 @@ static int   log_dat_03[10000];
 static int   log_dat_04[10000];
 static int   log_dat_05[10000];
 static int   log_dat_06[10000];
-static int   log_dat_07[10000];
+//static int   log_dat_07[10000];
 
 /*
 static float log_fdat_00[15000];
@@ -212,6 +212,7 @@ static void log_dat( ){
   log_dat_06[log_cnt]  = gAng_Robo-> log_left_pwm;
   log_dat_07[log_cnt]  = gAng_Robo-> log_right_pwm;
   */
+  /*
   log_dat_00[log_cnt]  = gAng_Eye->dansa;
   log_dat_01[log_cnt]  = gAng_Eye->odo;
   log_dat_02[log_cnt]  = gAng_Robo-> log_gyro;
@@ -221,6 +222,16 @@ static void log_dat( ){
   log_dat_05[log_cnt]  = gAng_Robo-> log_left_pwm;
   log_dat_06[log_cnt]  = (int)gAng_Eye->xvalue;
   log_dat_07[log_cnt]  = (int)gAng_Eye->yvalue;
+  */
+
+  log_dat_00[log_cnt]  = gAng_Eye->dansa;
+  log_dat_01[log_cnt]  = gAng_Eye->odo;
+  log_dat_02[log_cnt]  = gAng_Eye->linevalue;
+  log_dat_03[log_cnt]  = gAng_Robo-> log_forward;
+
+  log_dat_04[log_cnt]  = gAng_Eye->abs_angle;
+  log_dat_05[log_cnt]  = (int)gAng_Eye->xvalue;
+  log_dat_06[log_cnt]  = (int)gAng_Eye->yvalue;
 
 
 
@@ -240,11 +251,11 @@ static void export_log_dat( ){
     FILE* file_id;
     int battery = ev3_battery_voltage_mV();
     file_id = fopen( "log_dat.csv" ,"w");
-    fprintf(file_id, "dansa,odo,gyro,forward,tail_angle,left_pwm,x,y\n");
+    fprintf(file_id, "dansa,odo,line,forward,angle,x,y\n");
     int cnt;
 
     for(cnt = 0; cnt < log_size ; cnt++){
-      fprintf(file_id, "%d,%d,%d,%d,%d,%d,%d,%d\n",log_dat_00[cnt],log_dat_01[cnt], log_dat_02[cnt],log_dat_03[cnt],log_dat_04[cnt],log_dat_05[cnt],log_dat_06[cnt],log_dat_07[cnt]);
+      fprintf(file_id, "%d,%d,%d,%d,%d,%d,%d\n",log_dat_00[cnt],log_dat_01[cnt], log_dat_02[cnt],log_dat_03[cnt],log_dat_04[cnt],log_dat_05[cnt],log_dat_06[cnt]);
     }
     fclose(file_id);
 }
