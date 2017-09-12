@@ -201,7 +201,7 @@ static void sys_destroy(){
 
 #ifdef LOG_RECORD
 static void log_dat( ){
-
+  /*
   log_dat_00[log_cnt]  = gAng_Brain->tail_mode_lflag;
   log_dat_01[log_cnt]  = gAng_Robo-> log_forward;
   log_dat_02[log_cnt]  = gAng_Robo-> log_gyro;
@@ -211,7 +211,16 @@ static void log_dat( ){
   log_dat_05[log_cnt]  = gAng_Robo-> log_battery;
   log_dat_06[log_cnt]  = gAng_Robo-> log_left_pwm;
   log_dat_07[log_cnt]  = gAng_Robo-> log_right_pwm;
+  */
+  log_dat_00[log_cnt]  = gAng_Eye->dansa;
+  log_dat_01[log_cnt]  = gAng_Eye->odo;
+  log_dat_02[log_cnt]  = gAng_Robo-> log_gyro;
+  log_dat_03[log_cnt]  =  gAng_Robo-> log_forward;
 
+  log_dat_04[log_cnt]  = gTailMotor.getCount();
+  log_dat_05[log_cnt]  = gAng_Robo-> log_left_pwm;
+  log_dat_06[log_cnt]  = (int)gAng_Eye->xvalue;
+  log_dat_07[log_cnt]  = (int)gAng_Eye->yvalue;
   /*
   log_fdat_00[log_cnt] = gAng_Eye->abs_angle;
   log_fdat_01[log_cnt] = gAng_Robo->log_right_pwm;
@@ -228,8 +237,7 @@ static void export_log_dat( ){
     FILE* file_id;
     int battery = ev3_battery_voltage_mV();
     file_id = fopen( "log_dat.csv" ,"w");
-    fprintf(file_id, "battery:%d\n",battery);
-    fprintf(file_id, "tail_mode,forward,gyro,tail_angle,left_wheel_enc,battery,left_pwm,right_pwwm\n");
+    fprintf(file_id, "dansa,odo,gyro,forward,tail_angle,left_pwm,x,y\n");
     int cnt;
 
     for(cnt = 0; cnt < log_size ; cnt++){
@@ -536,6 +544,10 @@ void robo_task(intptr_t exinf) {
 
 //Main Task
 void main_task(intptr_t unused) {
+  ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
+  ev3_lcd_set_font(EV3_FONT_MEDIUM);
+  ev3_lcd_draw_string("MAIDO",0, 40);
+
   sys_initialize();
 
   //calibrate color sensor and set threshold of anago eye

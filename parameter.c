@@ -9,6 +9,9 @@ float WheelDiameter = 79.95;  //背面から見て左タイヤの直径[mm] 0817
 float WHEEL_R       = 39.975; //Wheel radius
 int   RoboTread     = 160; //トレッド長さ[mm]
 
+int   CL_SNSR_GAIN_GRAY = 2;
+
+
 //Parameter of time length unit
 float dT_100ms = 0.1;
 float dT_4ms   = 0.004;
@@ -35,8 +38,13 @@ float RAD_450_DEG = 7.8540;
 //Parameter of Course
 float FINAL_STRAIGHT_LENGTH = 1100.0;
 float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
-float FST_DANSA_POS         =  260;
-float SCD_DANSA_POS         =  260;
+
+//Parameter of Step
+float STEP_START_LENGTH     = 400;
+float FST_DANSA_POS         = 260;
+float SCD_DANSA_POS         = 260;
+
+int   STEP_CLIMB_SPPED      = 15;
 
 float STEP_TO_GARAGE_LENGTH = 1100;
 

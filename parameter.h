@@ -21,6 +21,9 @@ extern float WheelDiameter; //背面から見てタイヤの直径[mm]
 extern float WHEEL_R;       //radius of wheel[mm]
 extern int   RoboTread;      //トレッド長さ[mm]
 
+extern int   CL_SNSR_GAIN_GRAY;
+
+
 //Parameter of time length unit
 extern float dT_100ms;
 extern float dT_4ms;
@@ -48,8 +51,12 @@ extern float RAD_450_DEG;
 //Parameter of Course
 extern float FINAL_STRAIGHT_LENGTH;
 extern float DEAD_ZONE_LENGTH;
+
+//Parameter of Step
+extern float STEP_START_LENGTH;
 extern float FST_DANSA_POS;
 extern float SCD_DANSA_POS;
+extern int   STEP_CLIMB_SPPED;
 extern float STEP_TO_GARAGE_LENGTH;
 
 
