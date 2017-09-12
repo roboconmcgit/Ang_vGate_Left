@@ -221,6 +221,9 @@ static void log_dat( ){
   log_dat_05[log_cnt]  = gAng_Robo-> log_left_pwm;
   log_dat_06[log_cnt]  = (int)gAng_Eye->xvalue;
   log_dat_07[log_cnt]  = (int)gAng_Eye->yvalue;
+
+
+
   /*
   log_fdat_00[log_cnt] = gAng_Eye->abs_angle;
   log_fdat_01[log_cnt] = gAng_Robo->log_right_pwm;

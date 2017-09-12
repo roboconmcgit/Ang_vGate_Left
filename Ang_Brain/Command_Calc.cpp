@@ -6,7 +6,7 @@
 using ev3api::Clock;
 
 #define liting_radius 10; // liting spot radius [mm]
-#define STEP_DEBUG
+//#define STEP_DEBUG
 //#define GARAGE_DEBUG
 //#define BALANCE_DEBUG
 
