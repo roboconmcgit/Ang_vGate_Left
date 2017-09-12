@@ -43,13 +43,14 @@ float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
 float STEP_START_LENGTH     = 400;
 float FST_DANSA_POS         = 260;
 float SCD_DANSA_POS         = 260;
-
 int   STEP_CLIMB_SPPED      = 15;
 
+//Parameter of Garage
 float STEP_TO_GARAGE_LENGTH = 1100;
+float GARAGE_X_POS          = 1100;
+float GARAGE_LENGTH         =  150;
 
 //Parameter of Area
-
 //x_left, x_right, y_under, y_top
 /*ライン（攻）
 float LineTrace1Area[4]={0.0, 936.52, 0.0, 2000.0};

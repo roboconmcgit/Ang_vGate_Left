@@ -18,10 +18,10 @@ CommandCalc::CommandCalc(){
 }
 
 void CommandCalc::init( ){
-  gClock       = new Clock();
-  Track_Mode = Start_to_1st_Corner;
-  Step_Mode  = Step_Start;
-
+  gClock            = new Clock();
+  Track_Mode        = Start_to_1st_Corner;
+  Step_Mode         = Step_Start;
+  mYaw_angle_offset = 0.0;
 #ifdef STEP_DEBUG
   Track_Mode = Return_to_Line;
   //  Track_Mode = Go_Step;
@@ -31,6 +31,12 @@ void CommandCalc::init( ){
   //Track_Mode = Return_to_Line;
   Track_Mode =  Track_Debug_00;
 #endif
+
+#ifdef GARAGE_DEBUG
+  Track_Mode =  Approach_to_Garage;
+  mYaw_angle_offset = FIVE_PAI;
+#endif
+
 }
 
 void CommandCalc::SetCurrentData(int   linevalue,
@@ -60,7 +66,7 @@ void CommandCalc::SetCurrentData(int   linevalue,
     mOdo               = odo;
     mSpeed             = speed;
     mYawrate           = yawrate;
-    mYawangle          = abs_angle;
+    mYawangle          = abs_angle + mYaw_angle_offset; 
     mTail_angle        = robo_tail_angle;
     mRobo_stop         = robo_stop;
     mRobo_forward      = robo_forward;
@@ -199,6 +205,8 @@ void CommandCalc::Track_run( ) {
 
 
     ref_odo = mOdo + STEP_TO_GARAGE_LENGTH;
+    ref_x   = ref_x + GARAGE_X_POS;
+    line_det = false;
 
     y_t = -0.5*((FIVE_PAI) - mYawangle);
     yawratecmd = y_t;
@@ -209,23 +217,29 @@ void CommandCalc::Track_run( ) {
     anglecommand = TAIL_ANGLE_RUN;
     Track_Mode = Go_to_Garage;
 
+
     break;
     
   case Go_to_Garage:
+
+
     if(mLinevalue > 50){
       line_det = true;
-    }
+      }
+
 
     if(line_det == false){
       y_t = -0.5*((FIVE_PAI+RAD_5_DEG) - mYawangle);
       yawratecmd = y_t;
     }else{
+      
       LineTracerYawrate((CL_SNSR_GAIN_GRAY * mLinevalue));
     }
-    forward = 0.3*(gStep->CalcPIDContrInput(ref_odo, mOdo));
+    //    forward = 0.3*(gStep->CalcPIDContrInput(ref_odo, mOdo));
+    forward = 0.7*(gStep->CalcPIDContrInput(ref_odo, mOdo));
     anglecommand = TAIL_ANGLE_RUN;
 
-    if(mOdo >= ref_odo){
+    if((mOdo >= ref_odo)||(mXvalue > ref_x)){
       Track_Mode = Garage_Tail_On;
     }
     break;
@@ -252,14 +266,29 @@ void CommandCalc::Track_run( ) {
     if(mYawangle >= ref_angle){
       forward = 0;
       yawratecmd = 0;
+      clock_start = gClock->now();
+      ref_odo = mOdo - GARAGE_LENGTH;
+      Track_Mode = Garage_Stop;
     }else{
       forward = 0;
       y_t = -1.0;
       yawratecmd = y_t;
     }
+    break;
 
-
-
+  case Garage_Stop:
+    tail_mode_lflag = true;
+    if(gClock->now() - clock_start > 500){
+	forward    = -10;
+	yawratecmd = 0;
+      if(mOdo < ref_odo){
+	forward    = 0;
+	yawratecmd = 0;
+      }
+    }else{
+      forward    = 0;
+      yawratecmd = 0;
+    }
     break;
 
   case Track_Debug_00:
@@ -722,7 +751,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
   /*前提条件：ロボットがライン上にあること*/
 
   float y_t;
-  static float angle_change_right_edge_trace;
   static float target_odo;
   static float target_angle;
   static float target_tail_angle;
@@ -764,9 +792,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       yawratecmd = 0.0;
     }
     if(dansa){
-      Step_Mode = First_Dansa;
-      target_odo = odo + FST_DANSA_POS;
+      Step_Mode   = First_Dansa;
+      target_odo  = odo + FST_DANSA_POS;
       clock_start = gClock->now();
+      dansa_cnt   = 0;
+      ref_x       = mXvalue; //reference x pos for Garage
     }
 
 
@@ -794,7 +824,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }else{
       forward = -10;
       yawratecmd = 0;
-      if((gClock->now() - clock_start) > 1000){
+      if((gClock->now() - clock_start) > 3000){
 	dansa_cnt = 0;
       }
     }

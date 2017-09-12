@@ -3,7 +3,7 @@
 #include "ang_brain.h"
 #define liting_radius 10; // liting spot radius [mm]
 //#define DEBUG
-//#define STEP_DEBUG
+//#define TRACK_DEBUG
 
 Ang_Brain::Ang_Brain() {
 
@@ -46,15 +46,15 @@ void Ang_Brain::run() {
 
 
 
-	if(Strategy == Goal){
-	  gCommandCalc->Track_run();
-	}
-	else{
-	  gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
-	}
+  if(Strategy == Goal){
+    gCommandCalc->Track_run();
+  }
+  else{
+    gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
+  }
 
 
-#ifdef STEP_DEBUG
+#ifdef TRACK_DEBUG
 	gCommandCalc->Track_run();
 #endif
 	

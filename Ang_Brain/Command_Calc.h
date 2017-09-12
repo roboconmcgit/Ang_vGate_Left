@@ -1,11 +1,3 @@
-/******************************************************************************
- *  ang_brain.h (for LEGO Mindstorms EV3)
- *  Created on: 2017/07/25
- *  Implementation of the Class ang_brain
- *  Author: Keiichi Tomii
- *  Copyright (c) 2015 Embedded Technology Software Design Robot Contest
- *****************************************************************************/
-
 #include "parameter.h"
 #include "util.h"
 #include "Brain_Calc_Library.h"
@@ -113,6 +105,7 @@ private:
       Go_to_Garage,
       Garage_Tail_On,
       Garage_In,
+      Garage_Stop,
       Stop_Robo,
       Track_Debug_00,
       Track_Debug_01,
@@ -162,6 +155,9 @@ private:
     float mYawrate;   //ヨーレート
     float mYawangle;  //ヨー角
     int   mTail_angle;
+    float mYaw_angle_offset;
+
+    float ref_x;
     //signals for robo movement
     bool  mRobo_stop       = 0;
     bool  mRobo_forward    = 0;
@@ -169,7 +165,7 @@ private:
     bool  mRobo_turn_left  = 0;
     bool  mRobo_turn_right = 0;
 
-    bool  mDansa;      //段差検出値
+    bool  mDansa;
     bool  mRobo_balance_mode;
     int   mMax_Forward;
     float mMax_Yawrate;
