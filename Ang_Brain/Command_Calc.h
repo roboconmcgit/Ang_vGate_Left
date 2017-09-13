@@ -30,6 +30,7 @@ public:
 	void StrategyCalcRun(int strategy_num, int virtualgate_num, float xvalue, float yvalue, float yawangle);//走行戦略を計算
 	void Track_run();
 
+	bool  left_line_edge = true;
 	int   forward;         //前進目標値
 	float yawratecmd;      //目標ヨーレート
 	float anglecommand;    //尻尾角度

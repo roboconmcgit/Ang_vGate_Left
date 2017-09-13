@@ -22,6 +22,8 @@ void CommandCalc::init( ){
   Track_Mode        = Start_to_1st_Corner;
   Step_Mode         = Step_Start;
   mYaw_angle_offset = 0.0;
+  left_line_edge    = true;
+
 #ifdef STEP_DEBUG
   Track_Mode = Return_to_Line;
   //  Track_Mode = Go_Step;
@@ -204,9 +206,10 @@ void CommandCalc::Track_run( ) {
   case Approach_to_Garage:
 
 
-    ref_odo = mOdo + STEP_TO_GARAGE_LENGTH;
-    ref_x   = ref_x + GARAGE_X_POS;
-    line_det = false;
+    ref_odo        = mOdo + STEP_TO_GARAGE_LENGTH;
+    ref_x          = ref_x - GARAGE_X_POS;
+    line_det       = false;
+    left_line_edge = false;
 
     y_t = -0.5*((FIVE_PAI) - mYawangle);
     yawratecmd = y_t;
@@ -214,6 +217,7 @@ void CommandCalc::Track_run( ) {
     gStep->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
     forward = 0.1*(gStep->CalcPIDContrInput(ref_odo, mOdo));
     
+    clock_start = gClock->now();
     anglecommand = TAIL_ANGLE_RUN;
     Track_Mode = Go_to_Garage;
 
@@ -222,11 +226,12 @@ void CommandCalc::Track_run( ) {
     
   case Go_to_Garage:
 
-
-    if(mLinevalue > 50){
-      line_det = true;
+    /*
+    if(gClock->now() - clock_start > 1000){    
+      if(mLinevalue > 50){
+	line_det = true;
       }
-
+      }*/
 
     if(line_det == false){
       y_t = -0.5*((FIVE_PAI+RAD_5_DEG) - mYawangle);
@@ -239,7 +244,8 @@ void CommandCalc::Track_run( ) {
     forward = 0.7*(gStep->CalcPIDContrInput(ref_odo, mOdo));
     anglecommand = TAIL_ANGLE_RUN;
 
-    if((mOdo >= ref_odo)||(mXvalue > ref_x)){
+    if((mOdo >= ref_odo)||(mXvalue < ref_x)){
+    //for debug  if((mOdo >= ref_odo)||(mYvalue < ref_x)){
       Track_Mode = Garage_Tail_On;
     }
     break;
@@ -255,7 +261,7 @@ void CommandCalc::Track_run( ) {
       forward    = 0;
       yawratecmd = 0;
       clock_start = gClock->now();
-      ref_angle = mYawangle + PAI;
+      ref_angle = mYawangle + PAI + RAD_15_DEG;
       Track_Mode = Garage_In;
     }
 
@@ -268,7 +274,7 @@ void CommandCalc::Track_run( ) {
       yawratecmd = 0;
       clock_start = gClock->now();
       ref_odo = mOdo - GARAGE_LENGTH;
-      Track_Mode = Garage_Stop;
+      //      Track_Mode = Garage_Stop;
     }else{
       forward = 0;
       y_t = -1.0;
@@ -489,23 +495,28 @@ void CommandCalc::LineTracer(int line_value,float traceforward) {
 //2017/08/06多田さんライントレーサー
 void CommandCalc::LineTracerYawrate(int line_value) {
 
-    y_t = -1.0*(((float)line_value-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
-    if(y_t > 10.0) y_t = 10.0;
-    if(y_t < -10.0) y_t = -10.0;
-	y_t = y_t + 7.0*(y_t/8.0)*(y_t/8.0)*(y_t/8.0);
-//    yawratecmd = y_t/4.0;
-    yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+  //    y_t = -1.0*(((float)line_value-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
+  y_t = (((float)line_value-50.0)/50.0) * (float)liting_radius;//add(-1*) for Left Edge Trace
+  if(left_line_edge){
+    y_t = -1.0 * y_t;
+  }
 
-    if(yawratecmd > mMax_Yawrate){
-      yawratecmd =  mMax_Yawrate;
-
-    }else if (yawratecmd < mMin_Yawrate){
-      yawratecmd = mMin_Yawrate;
-    }else{
-      yawratecmd = yawratecmd;
-    }
-
-    y_t_prev = y_t;
+  if(y_t > 10.0) y_t = 10.0;
+  if(y_t < -10.0) y_t = -10.0;
+  y_t = y_t + 7.0*(y_t/8.0)*(y_t/8.0)*(y_t/8.0);
+  //    yawratecmd = y_t/4.0;
+  yawratecmd = (y_t/4.0)*(pg + df*(y_t-y_t_prev));
+  
+  if(yawratecmd > mMax_Yawrate){
+    yawratecmd =  mMax_Yawrate;
+    
+  }else if (yawratecmd < mMin_Yawrate){
+    yawratecmd = mMin_Yawrate;
+  }else{
+    yawratecmd = yawratecmd;
+  }
+  
+  y_t_prev = y_t;
 
 }
 
@@ -761,7 +772,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case Step_Start:
     dansa_cnt = 0;
-    forward =  50;
+    //    forward =  50;
+    forward =  70;
     LineTracerYawrate(( CL_SNSR_GAIN_GRAY * line_value));
     target_odo = odo + STEP_START_LENGTH;
  
@@ -783,8 +795,10 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
     if(odo > target_odo){
       forward =  20;
+
     }else{
-      forward =  50;
+      //      forward =  50;
+      forward =  70;
     }
 
     LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
@@ -797,6 +811,9 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       clock_start = gClock->now();
       dansa_cnt   = 0;
       ref_x       = mXvalue; //reference x pos for Garage
+#ifdef STEP_DEBUG
+      ref_x       =mYvalue;
+#endif
     }
 
 
@@ -839,7 +856,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     anglecommand = target_tail_angle;
 
 
-    if((gClock->now() - clock_start) > 5000){
+    //    if((gClock->now() - clock_start) > 5000){
+    if((gClock->now() - clock_start) > 3000){
       Step_Mode = First_Dansa_Tail_On;
       clock_start = gClock->now();
     }
@@ -859,10 +877,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       target_angle = angle + RAD_360_DEG + RAD_15_DEG;
     }
 
-#ifdef STEP_DEBUG
-    
-#endif
-
     break;
     
   case Fst_Turn_Pos_Adj:
@@ -871,7 +885,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     yawratecmd = 0;
     anglecommand = target_tail_angle;
     
-    if((gClock->now() - clock_start) > 3000){
+    //    if((gClock->now() - clock_start) > 3000){
+    if((gClock->now() - clock_start) > 500){
       Step_Mode = First_Turn;
       forward = 0;
       yawratecmd = 0;
@@ -913,7 +928,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case First_Dansa_Stand_Up:
 
-    if((gClock->now() - clock_start) > 3000){
+    //    if((gClock->now() - clock_start) > 3000){
+    if((gClock->now() - clock_start) > 100){
 
       forward    = 0;
       yawratecmd = 0;
@@ -932,15 +948,14 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       forward    = 0;
       yawratecmd = 0;
     }
-#ifdef STEP_DEBUG
-
-#endif
     break;
 
   case Approach_to_2nd_Step:
     
 
-    if((gClock->now() - clock_start) < 5000){
+    //    if((gClock->now() - clock_start) < 5000){
+    if((gClock->now() - clock_start) < 1000){
+
       forward    = 0;
       yawratecmd = 0;
       anglecommand = TAIL_ANGLE_RUN;
@@ -948,16 +963,15 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       forward = 10;
 
       y_t = -0.5*(2.5*PAI - angle);
-#ifdef STEP_DEBUG
-      //      y_t = -0.5*(2.0*PAI - angle);
-#endif
+
       yawratecmd = y_t;
 
 
       if(dansa){
 	forward    = 0;
 	yawratecmd = 0;
-	Step_Mode = Pre_Second_Dansa;
+	//	Step_Mode = Pre_Second_Dansa;
+	Step_Mode = Second_Dansa;
 	clock_start = gClock->now();
 	target_odo = odo + SCD_DANSA_POS;
       }
@@ -1039,7 +1053,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case Second_Turn:
     tail_mode_lflag = true;
-    if((gClock->now() - clock_start) > 1000){
+    //    if((gClock->now() - clock_start) > 1000){
+    if((gClock->now() - clock_start) > 500){
       if(angle >= target_angle){
 	Step_Mode = Second_Pre_Stand_Up;
 	clock_start = gClock->now();
@@ -1082,7 +1097,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case Second_Dansa_Stand_Up:
 
-    if((gClock->now() - clock_start) > 3000){
+    //    if((gClock->now() - clock_start) > 3000){
+    if((gClock->now() - clock_start) > 1000){
       
       forward    = 0;
       yawratecmd = 0;

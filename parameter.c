@@ -40,14 +40,20 @@ float FINAL_STRAIGHT_LENGTH = 1100.0;
 float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
 
 //Parameter of Step
-float STEP_START_LENGTH     = 400;
+//float STEP_START_LENGTH     = 400;
+float STEP_START_LENGTH     = 550;
 float FST_DANSA_POS         = 260;
 float SCD_DANSA_POS         = 260;
 int   STEP_CLIMB_SPPED      = 15;
 
 //Parameter of Garage
-float STEP_TO_GARAGE_LENGTH = 1100;
-float GARAGE_X_POS          = 1100;
+//float STEP_TO_GARAGE_LENGTH = 1100;
+float STEP_TO_GARAGE_LENGTH = 11100;
+
+//float GARAGE_X_POS          = 1100;
+float GARAGE_X_POS          = 1000;
+
+
 float GARAGE_LENGTH         =  150;
 
 //Parameter of Area
