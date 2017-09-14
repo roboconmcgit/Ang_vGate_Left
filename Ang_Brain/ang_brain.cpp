@@ -45,13 +45,14 @@ void Ang_Brain::run() {
   
 
 
-
+  
   if(Strategy == Goal){
     gCommandCalc->Track_run();
   }
   else{
     gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
   }
+
 
 
 #ifdef TRACK_DEBUG
