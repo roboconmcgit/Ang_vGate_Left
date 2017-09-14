@@ -56,6 +56,8 @@ extern float DEAD_ZONE_LENGTH;
 extern float STEP_START_LENGTH;
 extern float FST_DANSA_POS;
 extern float SCD_DANSA_POS;
+extern float SCD_DANSA_ON_POS;
+
 extern int   STEP_CLIMB_SPPED;
 
 //Parameter of Garage

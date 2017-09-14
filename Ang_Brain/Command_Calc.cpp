@@ -806,8 +806,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
  
 
     clock_start = gClock->now();
-    anglecommand = TAIL_ANGLE_RUN; //0817 tada
-    
+    anglecommand = TAIL_ANGLE_RUN;
     Step_Mode = Approach_to_Step;   
 
 #ifdef STEP_DEBUG
@@ -846,13 +845,14 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     break;
     */
+
     if(dansa){
       Step_Mode   = First_Dansa;
       target_odo  = odo + FST_DANSA_POS;
       clock_start = gClock->now();
       dansa_cnt   = 0;
-      gStep->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
       target_cnt = 0;
+      gStep->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
       ref_x       = mXvalue; //reference x pos for Garage
 
 #ifdef STEP_DEBUG
@@ -932,9 +932,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	dansa_cnt = 0;
       }
     }
-
-
-
     break;
 
   case First_Dansa_On:
@@ -973,6 +970,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
     break;
     
+    //not used 0914 kota
   case Fst_Turn_Pos_Adj:
     forward = gStep->CalcPIDContrInput(target_odo, odo);
     forward = forward * 0.1;
@@ -1050,18 +1048,15 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
     //    if((gClock->now() - clock_start) < 5000){
     if((gClock->now() - clock_start) < 1000){
-
-      forward    = 0;
-      yawratecmd = 0;
+      forward      = 0;
+      yawratecmd   = 0;
       anglecommand = TAIL_ANGLE_RUN;
     }else{
-      forward = 10;
-
-      y_t = -0.5*(2.5*PAI - angle);
-
+      forward    = 10;
+      y_t        = -0.5*(2.5*PAI - angle);
       yawratecmd = y_t;
 
-
+      /*0914 kota
       if(dansa){
 	forward    = 0;
 	yawratecmd = 0;
@@ -1069,11 +1064,23 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	Step_Mode = Second_Dansa;
 	clock_start = gClock->now();
 	target_odo = odo + SCD_DANSA_POS;
+	}*/
+
+      if(dansa){
+	Step_Mode   = Second_Dansa;
+	target_odo  = odo + SCD_DANSA_POS;
+	clock_start = gClock->now();
+	dansa_cnt   = 0;
+	target_cnt = 0;
+	gStep->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+
       }
+
     }
 
     break;
     
+    //not used 0914 ota
   case Pre_Second_Dansa:
     if((gClock->now() - clock_start) > 1000){
 	forward    = 0;
@@ -1085,6 +1092,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     break;
     
+    /*
   case Second_Dansa:
 
     if(dansa){
@@ -1114,22 +1122,70 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
   
     break;
+    */
+
+  case Second_Dansa:
+    if(dansa){
+      dansa_cnt++;
+    }
+    
+    if((odo > target_odo - 25 )&&(odo < target_odo + 25)){
+      target_cnt++;
+    }
+    
+    if(dansa_cnt < 50){
+
+      if(target_cnt > 750){ //3sec
+	forward    = 0;
+	yawratecmd = 0;
+	target_tail_angle =  TAIL_ANGLE_RUN;
+	clock_start = gClock->now();
+	Step_Mode   = Second_Dansa_On;
+	dansa       = 0;
+	target_cnt  = 0;
+	target_odo  = target_odo + 600;
+	gStep->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+      }else{
+	forward    = gStep->CalcPIDContrInput(target_odo, odo);
+	forward    = forward * 0.2;
+	yawratecmd = 0;
+	clock_start = gClock->now();
+      }
+    }else{
+      forward    = -10;
+      yawratecmd = 0;
+      if((gClock->now() - clock_start) > 3000){
+	dansa_cnt = 0;
+      }
+    }
+    break;
+
 
 
   case Second_Dansa_On:
-    gStep->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
-    forward = gStep->CalcPIDContrInput(target_odo, odo);
-    forward = forward * 0.5;
-    yawratecmd = 0;
+    forward      = gStep->CalcPIDContrInput(target_odo, odo);
+    forward      = forward * 0.1;
+    yawratecmd   = 0;
     anglecommand = target_tail_angle;
-
+    /*
     if((gClock->now() - clock_start) > 5000){
       Step_Mode = Second_Dansa_Tail_On;
       clock_start = gClock->now();
       forward    = 0;
       yawratecmd = 0;
+      }*/
+
+    if((odo > target_odo - 25 )&&(odo < target_odo + 25)){
+      target_cnt++;
     }
 
+    if(target_cnt > 750){ //3sec
+      Step_Mode = Second_Dansa_Tail_On;
+      clock_start = gClock->now();
+      forward    = 0;
+      yawratecmd = 0;
+    }
+    
   break;
 
   case Second_Dansa_Tail_On:
