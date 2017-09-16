@@ -1059,17 +1059,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       y_t        = -0.5*(2.5*PAI - angle);
       yawratecmd = y_t;
 
-      /*0914 kota
-      if(dansa){
-	forward    = 0;
-	yawratecmd = 0;
-	//	Step_Mode = Pre_Second_Dansa;
-	Step_Mode = Second_Dansa;
-	clock_start = gClock->now();
-	target_odo = odo + SCD_DANSA_POS;
-	}*/
-
-      if(dansa){
+      if((dansa)&&(odo > target_odo)){
 	Step_Mode   = Second_Dansa;
 	target_odo  = odo + SCD_DANSA_POS;
 	clock_start = gClock->now();
@@ -1095,38 +1085,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     break;
     
-    /*
-  case Second_Dansa:
-
-    if(dansa){
-      dansa_cnt++;
-    }
-
-    if(dansa_cnt < 50){
-      if(odo > target_odo - 30){
-	forward    = 0;
-	yawratecmd = 0;
-	target_tail_angle =  TAIL_ANGLE_RUN;
-	clock_start = gClock->now();
-	Step_Mode = Second_Dansa_On;
-	gForward->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
-	dansa = 0;
-      }else{
-	forward    =  STEP_CLIMB_SPPED;
-	yawratecmd = 0;
-	clock_start = gClock->now();
-      }
-    }else{
-      forward = -10;
-      yawratecmd = 0;
-      if((gClock->now() - clock_start) > 1000){
-	dansa_cnt = 0;
-      }
-    }
-  
-    break;
-    */
-
   case Second_Dansa:
     if(dansa){
       dansa_cnt++;
@@ -1146,8 +1104,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	Step_Mode   = Second_Dansa_On;
 	dansa       = 0;
 	target_cnt  = 0;
-	target_odo  = target_odo + 600;
-	//	gForward->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+	target_odo  = target_odo + SCD_DANSA_ON_POS;
 	gForward->init_pid(0.1,0.01,0.001,dT_4ms);
       }else{
 	forward    = gForward->calc_pid(target_odo, odo);
