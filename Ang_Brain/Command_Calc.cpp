@@ -852,7 +852,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       clock_start = gClock->now();
       dansa_cnt   = 0;
       target_cnt = 0;
-      gStep->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+      //      gForward->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+      gForward->init_pid(0.1,0.01,0.001,dT_4ms);
       ref_x       = mXvalue; //reference x pos for Garage
 
 #ifdef STEP_DEBUG
@@ -874,7 +875,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	target_tail_angle =  TAIL_ANGLE_RUN;
 	clock_start = gClock->now();
 	Step_Mode = First_Dansa_On;
-	gStep->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
+      gForward->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+      gForward->init_pid(0.1,0.01,0.001,dT_4ms);
 	dansa = 0;
       }else{
 	forward    =  STEP_CLIMB_SPPED;
@@ -908,7 +910,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	target_tail_angle =  TAIL_ANGLE_RUN;
 	clock_start = gClock->now();
 	//Step_Mode = First_Dansa_On;
-	//	gStep->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
+	//	gForward->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
 	dansa = 0;
       */
       if(target_cnt > 750){ //3sec
@@ -920,7 +922,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	dansa = 0;
 	target_cnt = 0;
       }else{
-	forward    = gStep->CalcPIDContrInput(target_odo, odo);
+	forward    = gForward->calc_pid(target_odo, odo);
+
 	forward    = forward * 0.3;
 	yawratecmd = 0;
 	clock_start = gClock->now();
@@ -935,7 +938,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case First_Dansa_On:
-    forward = gStep->CalcPIDContrInput(target_odo, odo);
+    forward = gForward->calc_pid(target_odo, odo);
     forward = forward * 0.1;
     yawratecmd = 0;
     anglecommand = target_tail_angle;
@@ -972,7 +975,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     
     //not used 0914 kota
   case Fst_Turn_Pos_Adj:
-    forward = gStep->CalcPIDContrInput(target_odo, odo);
+    forward = gForward->calc_pid(target_odo, odo);
     forward = forward * 0.1;
     yawratecmd = 0;
     anglecommand = target_tail_angle;
@@ -1072,7 +1075,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	clock_start = gClock->now();
 	dansa_cnt   = 0;
 	target_cnt = 0;
-	gStep->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+	gForward->init_pid(0.1,0.01,0.001,dT_4ms);
 
       }
 
@@ -1106,7 +1109,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	target_tail_angle =  TAIL_ANGLE_RUN;
 	clock_start = gClock->now();
 	Step_Mode = Second_Dansa_On;
-	gStep->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
+	gForward->SetInitPIDGain(0.1,0.005,0.05,dT_4ms);
 	dansa = 0;
       }else{
 	forward    =  STEP_CLIMB_SPPED;
@@ -1144,9 +1147,10 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	dansa       = 0;
 	target_cnt  = 0;
 	target_odo  = target_odo + 600;
-	gStep->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+	//	gForward->SetInitPIDGain(0.1,0.01,0.001,dT_4ms);
+	gForward->init_pid(0.1,0.01,0.001,dT_4ms);
       }else{
-	forward    = gStep->CalcPIDContrInput(target_odo, odo);
+	forward    = gForward->calc_pid(target_odo, odo);
 	forward    = forward * 0.2;
 	yawratecmd = 0;
 	clock_start = gClock->now();
@@ -1163,7 +1167,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
 
   case Second_Dansa_On:
-    forward      = gStep->CalcPIDContrInput(target_odo, odo);
+    forward      = gForward->calc_pid(target_odo, odo);
     forward      = forward * 0.1;
     yawratecmd   = 0;
     anglecommand = target_tail_angle;

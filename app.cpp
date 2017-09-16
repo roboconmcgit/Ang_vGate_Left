@@ -175,7 +175,6 @@ static void sys_initialize() {
   ev3_speaker_play_tone(NOTE_E4,200);
   ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
 
-
   /* Open Bluetooth file */
   bt = ev3_serial_open_file(EV3_SERIAL_BT);
   assert(bt != NULL);
@@ -560,13 +559,23 @@ void robo_task(intptr_t exinf) {
 void main_task(intptr_t unused) {
   ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
   ev3_lcd_set_font(EV3_FONT_MEDIUM);
-  ev3_lcd_draw_string("MAIDO",0, 40);
+  ev3_lcd_draw_string("LEFT",0, 40);
 
   sys_initialize();
 
   //calibrate color sensor and set threshold of anago eye
   mSys_Mode = CALIB_COLOR_SENSOR;
   color_sensor_calibration();
+  
+  //  if((white < 30)||(black > 10)||(black > white)||(white_slant < 30)||(black_slant > 10)||(black_slant > white_slant) ){
+  if((white < 30)||(black > 10)||(black > white)||(black_slant > white_slant)){
+    ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
+    ev3_lcd_set_font(EV3_FONT_MEDIUM);
+    ev3_lcd_draw_string("Warning Calib ERROR",0, 40);
+    tslp_tsk(1000);
+    color_sensor_calibration();
+  }
+
   gAng_Eye->set_White_Black_Threshold(white,black,white_slant,black_slant);
 
   //REDAY for START

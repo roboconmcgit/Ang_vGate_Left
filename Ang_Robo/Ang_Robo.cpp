@@ -129,7 +129,8 @@ void Ang_Robo::init() {
   mBalancer->init(offset);
   balance_mode = true; 
 
-  gTail_pwm->init_pid(0.1, 0.01, 0.01, dT_4ms);
+  //  gTail_pwm->init_pid(0.1, 0.01, 0.01, dT_4ms);
+  gTail_pwm->init_pid(0, 0, 0, 1);
     
   Stand_Mode = Balance_Mode;
 }
