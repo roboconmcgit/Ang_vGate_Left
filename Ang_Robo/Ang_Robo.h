@@ -10,14 +10,13 @@
 #include "GyroSensor.h"
 #include "Motor.h"
 #include "BalancerCpp.h"
-#include <deque>
+
 
 using namespace std;
 
 //17.07.28 k-ota copy from 3-apex
-//#define P_GAIN             0.65F /* 完全停止用モータ制御比例係数 */
 #define P_GAIN             1 /* 完全停止用モータ制御比例係数 */
-#define PWM_ABS_MAX          60 /* 完全停止用モータ制御PWM絶対最大値 */
+#define PWM_ABS_MAX       60 /* 完全停止用モータ制御PWM絶対最大値 */
 
 class Ang_Robo {
 public:
@@ -42,14 +41,22 @@ public:
     void tail_reset();
     void tail_stand_up(); //tail for gyro reset and color sensor calibration
     
-    void exportRobo(char *csv_header);
-    void saveData(int idata_num);
-    
-    bool balance_mode;
+    void tail_stand_from_balance();
+
+    int   offset;    
+    bool  balance_mode;
     int   mmForward;
     int   mmTurn;
     float mmYawratecmd;//目標Yawrate
     float mmYawrate;
+    int   log_forward;
+    int   log_turn;
+    int   log_gyro;
+    int   log_left_wheel_enc;
+    int   log_right_wheel_enc;
+    int   log_battery;
+    int   log_left_pwm;
+    int   log_right_pwm;
 
 private:
     const ev3api::GyroSensor& mGyroSensor;
@@ -58,6 +65,21 @@ private:
     ev3api::Motor& mTail_Motor;
     Balancer* mBalancer;
     PID *gTail_pwm = new PID();
+
+    enum enumStand_Mode{
+      Balance_Mode,
+      Tail_Down,
+      Tail_On,
+      Tail_Stand,
+      Stand_Vert,
+      Stand_to_Balance,
+      Tail_for_Run,
+      Debug_00
+    };
+    enumStand_Mode  Stand_Mode;
+
+
+
 
     int   mForward;
     float mTurn;
@@ -131,20 +153,11 @@ private:
 
     void TailMode(int mForward, float mTurn); //PWM Gen. without Balancer task 0814
     int mtail_mode_pwm_l;
-	int mtail_mode_pwm_r;
+    int mtail_mode_pwm_r;
 
-#ifdef DEBUG_ROBO
-    dequefloat> dsave_log1;
-    deque<float> dsave_log2;
-    deque<float> dsave_log3;
-    deque<float> dsave_log4;
-    deque<float> dsave_log5;
-    deque<float> dsave_log6;
-    deque<float> dsave_log7;
-    deque<float> dsave_log8;
-    deque<float> dsave_log9;
-    deque<float> dsave_log10;
-#endif
+    bool balance_off_en;
+    bool pre_balancer_on;
+
 
 };
 
