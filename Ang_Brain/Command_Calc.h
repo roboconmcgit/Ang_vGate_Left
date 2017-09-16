@@ -1,11 +1,3 @@
-/******************************************************************************
- *  ang_brain.h (for LEGO Mindstorms EV3)
- *  Created on: 2017/07/25
- *  Implementation of the Class ang_brain
- *  Author: Keiichi Tomii
- *  Copyright (c) 2015 Embedded Technology Software Design Robot Contest
- *****************************************************************************/
-
 #include "parameter.h"
 #include "util.h"
 #include "Brain_Calc_Library.h"
@@ -21,7 +13,6 @@ public:
 			    float odo,                
 			    float speed,
                             float yawrate,
-//                            float yawangle,
                             float abs_angle,
 			    int   robo_tail_angle,
 			    bool  robo_stop,
@@ -39,6 +30,7 @@ public:
 	void StrategyCalcRun(int strategy_num, int virtualgate_num, float xvalue, float yvalue, float yawangle);//走行戦略を計算
 	void Track_run();
 
+	bool  left_line_edge = true; //non used now, 
 	int   forward;         //前進目標値
 	float yawratecmd;      //目標ヨーレート
 	float anglecommand;    //尻尾角度
@@ -99,6 +91,7 @@ private:
     };
     
     enum enumTrack_Mode{
+      Start_to_1st_Straight,
       Start_to_1st_Corner,
       Fst_Corner,
       Snd_Corner,
@@ -109,8 +102,14 @@ private:
       Return_to_Line,
       Go_Step,
       Approach_to_Garage,
-      Stop_Robo
-    };
+      Go_to_Garage,
+      Garage_Tail_On,
+      Garage_In,
+      Garage_Stop,
+      Stop_Robo,
+      Track_Debug_00,
+      Track_Debug_01,
+      Track_Debug_02};
 
     enum enumStep_Mode{
       Step_Start,
@@ -120,20 +119,23 @@ private:
       First_Dansa,
       First_Dansa_On,
       First_Dansa_Tail_On,
+      Fst_Turn_Pos_Adj,
       First_Turn,
+      First_Pre_Stand_Up,
       First_Dansa_Stand_Up,
       Approach_to_2nd_Step,
+      Pre_Second_Dansa,
       Second_Dansa,
       Second_Dansa_On,
       Second_Dansa_Tail_On,
       Second_Turn,
+      Second_Pre_Stand_Up,
       Second_Dansa_Stand_Up,
       Approach_to_Exit,
 
       Change_Left_Edge_Trace,
       Left_edge_On,
-      End
-    };
+      End_of_Step};
 
 
     enumStrategy    Strategy;
@@ -152,6 +154,11 @@ private:
     float mYawrate;   //ヨーレート
     float mYawangle;  //ヨー角
     int   mTail_angle;
+    float mYaw_angle_offset;
+
+    float ref_x;
+
+
     //signals for robo movement
     bool  mRobo_stop       = 0;
     bool  mRobo_forward    = 0;
