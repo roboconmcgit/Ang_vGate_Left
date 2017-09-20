@@ -526,7 +526,8 @@ void brain_task(intptr_t exinf) {
                             gAng_Brain->yawratecmd,
                             gAng_Brain->anglecommand,
                             gAng_Eye->yawrate,
-                            gAng_Brain->tail_mode_lflag);//指令値をあなご手足に渡す
+                            gAng_Brain->tail_stand_mode,
+			    gAng_Brain->tail_lug_mode);//指令値をあなご手足に渡す
     }
     ext_tsk();
 }
@@ -549,7 +550,7 @@ void robo_task(intptr_t exinf) {
     wup_tsk(MAIN_TASK);  // バックボタン押下
   } else {
     gAng_Robo->run();
-    //kota 0811      gAng_Robo->saveData(500);
+    //gAng_Robo->run_anago_run();
   }
   ext_tsk();
 }

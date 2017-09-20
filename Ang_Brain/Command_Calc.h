@@ -34,10 +34,10 @@ public:
 	int   forward;         //前進目標値
 	float yawratecmd;      //目標ヨーレート
 	float anglecommand;    //尻尾角度
-	bool  tail_mode_lflag; //倒立走行フラグ
+	bool  tail_stand_mode; //倒立走行フラグ
+	bool  tail_lug_mode; //倒立走行フラグ
 
 private:
-
 
     void StartDashRunner();                              //スタートダッシュ
     void LineTracer(int line_value, float traceforward); //ライントレース
