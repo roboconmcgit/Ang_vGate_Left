@@ -12,7 +12,6 @@ void Ang_Brain::init() {
   gCommandCalc->init();
 }
 
-//ふるまいはコミュニケーション図に記載
 void Ang_Brain::run() {
   
   //位置推定->走行戦略判定
@@ -43,12 +42,12 @@ void Ang_Brain::run() {
 			       );      //6: ロボットの現在情報を取得
 
 	
-	if(Strategy == Goal){
+  if(Strategy == Goal){
     gCommandCalc->Track_run();
-	}
-	else{
-		  gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
-	}
+  }
+  else{
+    gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
+  }
   
   GetCalcResult(gCommandCalc->forward,
 		gCommandCalc->yawratecmd,

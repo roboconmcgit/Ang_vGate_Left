@@ -145,7 +145,7 @@ void StrategyDet::RunningStrategyDet(float x_value, float y_value, float yawangl
   */
   else{
 //    Strategy=LineTrace1;
-  	Strategy = Goal;
+    Strategy = Goal;
     Max_Forward =   50;
     Max_Yawrate =  3.0;
     Min_Yawrate = -3.0;

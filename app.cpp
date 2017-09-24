@@ -1,7 +1,7 @@
 //Anago System
 //Date:2017.7.25
 //Author:Kaoru Ota
-
+//https://github.com/roboconmcgit/Ang_vGate_Left
 #include "app.h"
 #include "util.h"
 #include "ev3api.h"
@@ -16,7 +16,7 @@
 //anagoサブシステム
 #include "ang_eye.h"
 #include "ang_brain.h"
-#include "Ang_Robo.h" //it will be changed to Ang_Robo
+#include "Ang_Robo.h"
 
 // デストラクタ問題の回避
 // https://github.com/ETrobocon/etroboEV3/wiki/problem_and_coping
@@ -293,7 +293,6 @@ static void color_sensor_calibration(){
       calib_flag2=1;
       break;
     }
-    //    calib_ref=ev3_color_sensor_get_reflect(color_sensor);
     calib_ref=gColorSensor.getBrightness();
     sprintf(s,"BLACK : %2d",calib_ref);
     ev3_lcd_draw_string(s, 0, CALIB_FONT_HEIGHT*2);
@@ -568,7 +567,6 @@ void main_task(intptr_t unused) {
   mSys_Mode = CALIB_COLOR_SENSOR;
   color_sensor_calibration();
   
-  //  if((white < 30)||(black > 10)||(black > white)||(white_slant < 30)||(black_slant > 10)||(black_slant > white_slant) ){
   if((white < 30)||(black > 10)||(black > white)||(black_slant > white_slant)){
     ev3_lcd_fill_rect(0, 0, EV3_LCD_WIDTH, EV3_LCD_HEIGHT, EV3_LCD_WHITE);
     ev3_lcd_set_font(EV3_FONT_MEDIUM);
