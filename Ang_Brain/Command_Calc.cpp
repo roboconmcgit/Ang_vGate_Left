@@ -845,7 +845,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     
     if(dansa_cnt < 50){
-      if(stable_cnt > 750){ //3sec // it would be chanced to Stable flag
+      if(stable_cnt > STBL_CNT_1st_DANSA){ //3sec // it would be chanced to Stable flag
 	forward = 0;
 	yawratecmd = 0;
 	ref_tail_angle =  TAIL_ANGLE_RUN;
@@ -967,7 +967,9 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case Approach_to_2nd_Step:
-    if((gClock->now() - clock_start) < 1000){
+    //    if((gClock->now() - clock_start) < 1000){
+    if((gClock->now() - clock_start) < 100){
+
       forward      = 0;
       yawratecmd   = 0;
       anglecommand = TAIL_ANGLE_RUN;
@@ -1011,7 +1013,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     
     if(dansa_cnt < 50){
-      if(stable_cnt > 750){ //3sec
+      if(stable_cnt > STBL_CNT_2nd_DANSA){
 	forward    = 0;
 	yawratecmd = 0;
 	ref_tail_angle =  TAIL_ANGLE_RUN;
@@ -1023,7 +1025,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	gForward->init_pid(0.1,0.01,0.001,dT_4ms);
       }else{
 	forward     = gForward->calc_pid(ref_odo, odo);
-	forward     = forward * 0.2;
+	//	forward     = forward * 0.2;
+	forward     = forward * 0.4;
+	if(forward > STEP_CLIMB_MAX_SPEED){
+	  forward     = STEP_CLIMB_MAX_SPEED;
+	}
 	yawratecmd  = 0;
 	clock_start = gClock->now();
       }
@@ -1040,7 +1046,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case Second_Dansa_On:
     forward      = gForward->calc_pid(ref_odo, odo);
-    forward      = forward * 0.1;
+    forward      = forward * 0.2;
     yawratecmd   = 0;
     anglecommand = ref_tail_angle;
 
@@ -1048,7 +1054,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       stable_cnt++;
     }
 
-    if(stable_cnt > 750){ //3sec
+    if(stable_cnt > STBL_CNT_2nd_DANSA_ON){
       Step_Mode = Second_Dansa_Tail_On;
       clock_start = gClock->now();
       forward    = 0;
@@ -1112,7 +1118,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case Second_Dansa_Stand_Up:
 
-    if((gClock->now() - clock_start) > 1000){
+    //    if((gClock->now() - clock_start) > 1000){
+    if((gClock->now() - clock_start) > 500){
       forward    = 0;
       yawratecmd = 0;
       anglecommand = TAIL_ANGLE_RUN;

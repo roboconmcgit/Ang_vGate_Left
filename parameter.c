@@ -44,9 +44,18 @@ float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
 float STEP_START_LENGTH     = 550;
 float FST_DANSA_POS         = 260;
 float SCD_DANSA_POS         = 200;
-float SCD_DANSA_ON_POS      =  60;
+//float SCD_DANSA_ON_POS      =  60;
+float SCD_DANSA_ON_POS      =  70;
 
-int   STEP_CLIMB_SPPED      = 15;
+int   STEP_CLIMB_MAX_SPEED    = 35;
+
+//int   STBL_CNT_1st_DANSA      = 750;
+int   STBL_CNT_1st_DANSA      = 200;
+//int   STBL_CNT_2_DANSA      = 750;
+int   STBL_CNT_2nd_DANSA      = 50;
+int   STBL_CNT_2nd_DANSA_ON   = 400;
+
+
 
 //Parameter of Garage
 //float STEP_TO_GARAGE_LENGTH = 1100;

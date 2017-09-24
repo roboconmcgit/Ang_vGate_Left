@@ -41,20 +41,21 @@ void Ang_Brain::run() {
 			       gStrategyDet->Min_Yawrate
 			       );      //6: ロボットの現在情報を取得
 
-	
   if(Strategy == Goal){
     gCommandCalc->Track_run();
   }
   else{
     gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
   }
-  
+
   GetCalcResult(gCommandCalc->forward,
 		gCommandCalc->yawratecmd,
 		gCommandCalc->anglecommand,
 		gCommandCalc->tail_stand_mode,
 		gCommandCalc->tail_lug_mode);   //8: 走行戦略の計算結果を取得
 }
+
+
 
 void Ang_Brain::setEyeCommand(int linevalue,
 			      float xvalue,

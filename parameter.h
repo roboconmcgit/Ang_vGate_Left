@@ -57,7 +57,12 @@ extern float FST_DANSA_POS;
 extern float SCD_DANSA_POS;
 extern float SCD_DANSA_ON_POS;
 
-extern int   STEP_CLIMB_SPPED;
+extern int   STEP_CLIMB_MAX_SPEED;
+
+extern int   STBL_CNT_1st_DANSA;
+extern int   STBL_CNT_2nd_DANSA;
+extern int   STBL_CNT_2nd_DANSA_ON;
+
 
 //Parameter of Garage
 extern float STEP_TO_GARAGE_LENGTH;
