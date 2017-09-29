@@ -3,6 +3,8 @@
 #include "ang_brain.h"
 #define liting_radius 10; // liting spot radius [mm]
 //#define DEBUG
+//#define LOG_RECORD
+
 
 Ang_Brain::Ang_Brain() {
 
@@ -47,6 +49,12 @@ void Ang_Brain::run() {
   else{
     gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
   }
+
+#ifdef LOG_RECORD
+  gCommandCalc->saveData();
+#endif
+
+
 
   GetCalcResult(gCommandCalc->forward,
 		gCommandCalc->yawratecmd,
@@ -120,3 +128,8 @@ void Ang_Brain::GetCalcResult(int forward_calc,
 
 }
 
+#ifdef LOG_RECORD
+void Ang_Brain::dump_log(){
+  gCommandCalc->export_dat();
+}
+#endif

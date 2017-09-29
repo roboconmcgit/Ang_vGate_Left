@@ -34,9 +34,10 @@ using ev3api::Clock;
 #define CALIB_FONT        (EV3_FONT_MEDIUM)
 #define CALIB_FONT_WIDTH  (6/*TODO: magic number*/)
 #define CALIB_FONT_HEIGHT (20/*TODO: magic number*/)
-#define LOG_RECORD
+//#define LOG_RECORD
 //#define RIGHT_COURCE_MODE
 //#define EYE_DEBUG
+//#define LOG_BRAIN
 
 // Device objects
 // オブジェクトを静的に確保する
@@ -610,11 +611,12 @@ void main_task(intptr_t unused) {
   mSys_Mode=START;
 
   //Start Dash sequence from here to robo_task.  
+  /*
   while(gTailMotor.getCount() <= 100){
     tslp_tsk(50);
     gAng_Robo->tail_control(TAIL_ANGLE_STAND_UP); //0819 changed by tada. original is 120
     TAIL_ANGLE_STAND_UP++;
-  }
+    }*/
   
   ev3_sta_cyc(ROBO_CYC);
   ter_tsk(BT_TASK);
@@ -643,7 +645,18 @@ void main_task(intptr_t unused) {
   gAng_Eye->export_dat( );
   ev3_lcd_draw_string("Saving Log Data is done",0, CALIB_FONT_HEIGHT*3);
 #endif
+
+#ifdef LOG_BRAIN
+  ev3_lcd_draw_string("Saving Brain Command Log Data",0, CALIB_FONT_HEIGHT*2);
+  gAng_Brain->dump_log( );
+  ev3_lcd_draw_string("Saving Log Data is done",0, CALIB_FONT_HEIGHT*3);
+#endif
+
+
+
   ev3_led_set_color(LED_OFF);
+
+
 
   sys_destroy();
   ext_tsk();

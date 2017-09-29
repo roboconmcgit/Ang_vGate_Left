@@ -6,13 +6,13 @@
 using ev3api::Clock;
 
 #define liting_radius 10; // liting spot radius [mm]
+
 //#define TADA_ROBO
 #define OTA_ROBO
-
 //#define STEP_DEBUG
 //#define GARAGE_DEBUG
 //#define DEBUG
-
+//#define LOG_RECORD
 
 Clock*       gClock;
 
@@ -28,6 +28,7 @@ void CommandCalc::init( ){
   left_line_edge    = true;
   tail_stand_mode   = false;
   tail_lug_mode     = false;
+  ref_forward       = 0.0;
 
 #ifdef STEP_DEBUG
   Track_Mode = Return_to_Line;
@@ -336,7 +337,7 @@ void CommandCalc::Track_run( ) {
 }
 
 void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float xvalue, float yvalue, float yawangle) {
-
+  
   Strategy=static_cast<enumStrategy>(strategy_num);
 
   switch(Strategy){
@@ -345,7 +346,24 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
     break;
     
   case LineTrace1:
-    forward = 100;
+
+    
+    if(mOdo > 50){
+      if(mSpeed > 250){
+	ref_forward = ref_forward;
+      }else{
+	ref_forward = ref_forward + 0.133;
+      }
+    }else{
+      ref_forward = 0.0;
+    }
+
+    forward = (int)(ref_forward + 0.5 + 50);
+
+    if(forward > 100){
+      forward = 100;
+      }
+
     LineTracerYawrate(mLinevalue);
     anglecommand = TAIL_ANGLE_RUN; 
     tail_stand_mode = false;
@@ -1190,3 +1208,34 @@ void CommandCalc::GarageRunner(){
 void CommandCalc::StopRobo(){
 
 }
+
+#ifdef LOG_RECORD
+
+void CommandCalc::saveData( ){
+
+  log_dat_00[log_cnt]  = forward;
+  log_dat_01[log_cnt]  = 0;
+  log_dat_02[log_cnt]  = 0;
+  log_fdat_00[log_cnt] = ref_forward;
+  log_fdat_01[log_cnt] = mOdo;
+  log_fdat_02[log_cnt] = mSpeed;
+
+  log_cnt++;
+  if (log_cnt == log_size){
+    log_cnt  = 0;
+  }
+}
+
+void CommandCalc::export_dat( ){
+    FILE* file_id;
+    file_id = fopen( "comand_dat.csv" ,"w");
+    fprintf(file_id, "forward,none,none2,ref_forward,mOdo,mSpeed\n");
+    int cnt;
+
+    for(cnt = 0; cnt < log_size ; cnt++){
+      fprintf(file_id, "%d,%d,%d,%f,%f,%f\n",log_dat_00[cnt],log_dat_01[cnt], log_dat_02[cnt],log_fdat_00[cnt],log_fdat_01[cnt], log_fdat_02[cnt]);
+    }
+    fclose(file_id);
+}
+
+#endif
