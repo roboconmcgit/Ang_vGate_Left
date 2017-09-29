@@ -352,13 +352,13 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
       if(mSpeed > 250){
 	ref_forward = ref_forward;
       }else{
-	ref_forward = ref_forward + 0.133;
+	ref_forward = ref_forward + START_FORWARD_STEP;
       }
     }else{
       ref_forward = 0.0;
     }
 
-    forward = (int)(ref_forward + 0.5 + 50);
+    forward = (int)(ref_forward + START_ROBO_FORWARD_VAL + 0.5);
 
     if(forward > 100){
       forward = 100;
