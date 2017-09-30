@@ -14,7 +14,11 @@ float START_ROBO_FORWARD_VAL = 100;
 float START_FORWARD_STEP     = 0.1;
 */
 
+/* fail rate under 10%
 float START_ROBO_FORWARD_VAL = 50;
+float START_FORWARD_STEP     = 0.1;
+*/
+float START_ROBO_FORWARD_VAL = 25;
 float START_FORWARD_STEP     = 0.1;
 
 int   CL_SNSR_GAIN_GRAY     =  2;
@@ -36,6 +40,8 @@ float MINUS_RAD_5_DEG  = -0.0873; //
 float MINUS_RAD_15_DEG = -0.2618; //
 float MINUS_RAD_30_DEG = -0.5236; //
 
+float RAD_89_DEG  = 1.5533; //
+float RAD_87_DEG  = 1.5184; //
 float RAD_90_DEG  = 1.5708; //
 float RAD_120_DEG = 2.0944; //
 float RAD_315_DEG = 5.4978; //
@@ -49,18 +55,23 @@ float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
 
 //Parameter of Step
 //float STEP_START_LENGTH     = 400;
-float STEP_START_LENGTH     = 550;
-float FST_DANSA_POS         = 260;
+//float STEP_START_LENGTH     = 550;
+float STEP_START_LENGTH     = 500;
+
+//float FST_DANSA_POS         = 260;
+float FST_DANSA_POS         = 270;
 float SCD_DANSA_POS         = 200;
 //float SCD_DANSA_ON_POS      =  60;
 float SCD_DANSA_ON_POS      =  70;
 
-int   STEP_CLIMB_MAX_SPEED    = 35;
+//int   STEP_CLIMB_MAX_SPEED    = 35;
+int   STEP_CLIMB_MAX_SPEED    = 30;
 
 //int   STBL_CNT_1st_DANSA      = 750;
 int   STBL_CNT_1st_DANSA      = 200;
 //int   STBL_CNT_2_DANSA      = 750;
-int   STBL_CNT_2nd_DANSA      = 50;
+//int   STBL_CNT_2nd_DANSA      = 50;
+int   STBL_CNT_2nd_DANSA      = 400;
 int   STBL_CNT_2nd_DANSA_ON   = 400;
 
 

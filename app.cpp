@@ -207,59 +207,49 @@ static void sys_destroy(){
 
 #ifdef LOG_RECORD
 static void log_dat( ){
+  
+  float float_to_int_x1000;
+
   /*
-  log_dat_00[log_cnt]  = gAng_Brain->tail_mode_lflag;
-  log_dat_01[log_cnt]  = gAng_Robo-> log_forward;
-  log_dat_02[log_cnt]  = gAng_Robo-> log_gyro;
-  log_dat_03[log_cnt]  = gTailMotor.getCount();
+  log_dat_0[log_cnt]  = ev3_battery_voltage_mV();
+  log_dat_0[log_cnt]  = ev3_battery_current_mA();
 
-  log_dat_04[log_cnt]  = gAng_Robo-> log_left_wheel_enc;
-  log_dat_05[log_cnt]  = gAng_Robo-> log_battery;
-  log_dat_06[log_cnt]  = gAng_Robo-> log_left_pwm;
-  log_dat_07[log_cnt]  = gAng_Robo-> log_right_pwm;
-  */
-  /*
-  log_dat_00[log_cnt]  = gAng_Eye->dansa;
-  log_dat_01[log_cnt]  = gAng_Eye->odo;
-  log_dat_02[log_cnt]  = gAng_Robo-> log_gyro;
-  log_dat_03[log_cnt]  =  gAng_Robo-> log_forward;
+  log_dat_0[log_cnt]  = gAng_Brain->tail_mode_lflag;
 
-  log_dat_04[log_cnt]  = gTailMotor.getCount();
-  log_dat_05[log_cnt]  = gAng_Robo-> log_left_pwm;
-  log_dat_06[log_cnt]  = (int)gAng_Eye->xvalue;
-  log_dat_07[log_cnt]  = (int)gAng_Eye->yvalue;
-  */
-  /*
-  log_dat_00[log_cnt]  = ev3_battery_voltage_mV();
-  log_dat_01[log_cnt]  = ev3_battery_current_mA();
-  log_dat_02[log_cnt]  = gAng_Eye->dansa;
-  log_dat_03[log_cnt]  = gAng_Eye->odo;
+  log_dat_0[log_cnt]  = gAng_Eye->dansa;
+  log_dat_0[log_cnt]  = gAng_Eye->odo
 
-  log_dat_04[log_cnt]  = gAng_Eye->velocity;
-  log_dat_05[log_cnt]  = gAng_Robo-> log_forward;
-  log_dat_06[log_cnt]  = gAng_Eye->abs_angle;
-  log_dat_07[log_cnt]  = (int)gAng_Eye->xvalue;
+  log_dat_0[log_cnt]  = gAng_Robo-> log_gyro;
 
-  log_dat_08[log_cnt]  = (int)gAng_Eye->yvalue;
+  log_dat_0[log_cnt]  = gAng_Eye->velocity;
+  log_dat_0[log_cnt]  = gAng_Robo-> log_forward;
+  log_dat_0[log_cnt]  = gAng_Eye->abs_angle;
+
+
+  log_dat_0[log_cnt]  = (int)gAng_Eye->xvalue;
+  log_dat_0[log_cnt]  = (int)gAng_Eye->yvalue;
+
+  log_dat_0[log_cnt]  = gAng_Robo-> log_left_pwm;
+  log_dat_0[log_cnt]  = gAng_Robo-> log_right_pwm;
+
+  log_dat_0[log_cnt]  = gAng_Robo-> log_left_wheel_enc;
+
+  log_dat_0[log_cnt]  = gTailMotor.getCount();
   */
 
-  log_dat_00[log_cnt]  = ev3_battery_voltage_mV();
-  log_dat_01[log_cnt]  = ev3_battery_current_mA();
-  log_dat_02[log_cnt]  = gTailMotor.getCount();;
-  log_dat_03[log_cnt]  = gAng_Robo->log_gyro;
+  float_to_int_x1000   =  gAng_Eye->abs_angle*1000.0;
+  
+  log_dat_00[log_cnt]  = gAng_Robo->log_left_wheel_enc;
+  log_dat_01[log_cnt]  = gAng_Robo->log_right_wheel_enc;;
+  log_dat_02[log_cnt]  = gAng_Robo->log_left_pwm;
+  log_dat_03[log_cnt]  = (int)float_to_int_x1000;
 
-  log_dat_04[log_cnt]  = gAng_Robo-> log_left_wheel_enc;
-  log_dat_05[log_cnt]  = gAng_Robo-> log_left_pwm;
-  log_dat_06[log_cnt]  = gAng_Robo-> log_forward;
+  log_dat_04[log_cnt]  = gAng_Robo->log_gyro;
+  log_dat_05[log_cnt]  = gTailMotor.getCount();;
+  log_dat_06[log_cnt]  = gAng_Robo->log_forward;
   log_dat_07[log_cnt]  = gAng_Eye->velocity;
 
   log_dat_08[log_cnt]  = gAng_Eye->odo;
-
-  /*
-  log_fdat_00[log_cnt] = gAng_Eye->abs_angle;
-  log_fdat_01[log_cnt] = gAng_Robo->log_right_pwm;
-  log_fdat_02[log_cnt] = gAng_Eye->odo;
-  */
 
   log_cnt++;
   if (log_cnt == log_size){
@@ -271,7 +261,7 @@ static void export_log_dat( ){
     FILE* file_id;
     int battery = ev3_battery_voltage_mV();
     file_id = fopen( "log_dat.csv" ,"w");
-    fprintf(file_id, "mV,mA,tail_cnt,gyro,left_wheel_enc,left_pwm,robo_forward,velocity,odo\n");
+    fprintf(file_id, "left_enc, right_enc,left_pwm,angle1000,gyro,tail_angle,forward,velo,odo\n");
     int cnt;
 
     for(cnt = 0; cnt < log_size ; cnt++){

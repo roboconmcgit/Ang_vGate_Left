@@ -578,7 +578,8 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_C2[3]={1458.8,  1246.03,  251.72          };
 	float Virtual_S3[4]={1614.4,  1048.17, 2255.65, 1492.0  };
 	float Virtual_C3[3]={3202.03,    0.0,  1750.0           };
-	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1760.0  };
+	//	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1760.0  };
+	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1810.0  };
 #endif
 
 
@@ -828,11 +829,13 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     
     if(odo > ref_odo){
       forward =  20;
+      //      y_t        = -0.5*( RAD_90_DEG - angle);
+      y_t        = -0.5*( RAD_89_DEG - angle);
+      yawratecmd = y_t;
     }else{
       forward =  70;
+      LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
     }
-
-    LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
 
     if((angle >  RAD_90_DEG)&&(yawratecmd < 0) ){
       yawratecmd = 0.0;
@@ -948,6 +951,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case First_Pre_Stand_Up:
+
+
     if(odo < ref_odo){
       forward = 15;
       y_t = -0.5*(2.5*PAI - angle);
@@ -960,7 +965,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       clock_start = gClock->now();
       Step_Mode = First_Dansa_Stand_Up;
     }
-    
     break;
 
   case First_Dansa_Stand_Up:
