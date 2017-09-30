@@ -18,7 +18,11 @@ float START_FORWARD_STEP     = 0.1;
 float START_ROBO_FORWARD_VAL = 50;
 float START_FORWARD_STEP     = 0.1;
 */
+/* too slow
 float START_ROBO_FORWARD_VAL = 25;
+float START_FORWARD_STEP     = 0.1;
+*/
+float START_ROBO_FORWARD_VAL = 40;
 float START_FORWARD_STEP     = 0.1;
 
 int   CL_SNSR_GAIN_GRAY = 2;
@@ -63,7 +67,8 @@ float RTN_DET_ANGLE         = 1.5; //[rad] 0930 tada Return to Line detect absol
 //Parameter of Step
 //float STEP_START_LENGTH   = 400;
 //float STEP_START_LENGTH   = 550;
-float STEP_START_LENGTH     = 500;
+//float STEP_START_LENGTH     = 500;
+float STEP_START_LENGTH     = 200;
 
 //float FST_DANSA_POS       = 260;
 float FST_DANSA_POS         = 270;

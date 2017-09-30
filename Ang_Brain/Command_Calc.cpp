@@ -395,7 +395,7 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
     break;
     
   case LineTrace1:
-    if(mOdo > 50){
+    if(mOdo > 20){
       if(mSpeed > 250){
 	ref_forward = ref_forward;
       }else{
@@ -879,7 +879,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       y_t        = -0.5*( RAD_89_DEG - angle);
       yawratecmd = y_t;
     }else{
-      forward =  70;
+      //      forward =  70;
+      forward =  30;
       LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
     }
 
@@ -894,29 +895,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       yawratecmd = 0.0;
     }
 #endif
-
-    /*    
-    if(odo > ref_odo){
-      forward =  20;
-
-    }else{
-      forward =  70;
-    }
-#ifdef OTA_ROBO
-    LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
-
-    if((angle >  (RAD_90_DEG))&&(yawratecmd < 0) ){
-      yawratecmd = 0.0;
-    }
-#endif
-#ifdef TADA_ROBO
-    LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
-
-    if((angle >  (RAD_90_DEG + 0.3))&&(yawratecmd < 0) ){
-      yawratecmd = 0.0;
-    }
-#endif
-    */
 
     if(dansa){
       Step_Mode   = First_Dansa;
@@ -953,7 +931,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	stable_cnt = 0;
       }else{
 	forward    = gForward->calc_pid(ref_odo, odo);
-	forward    = forward * 0.3;
+	forward     = forward * 0.4;
+	if(forward > STEP_CLIMB_MAX_SPEED){
+	  forward     = STEP_CLIMB_MAX_SPEED;
+	}
+
 	yawratecmd = 0;
 	clock_start = gClock->now();
       }
