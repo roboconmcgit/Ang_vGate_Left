@@ -6,8 +6,8 @@
 using ev3api::Clock;
 
 #define liting_radius 10; // liting spot radius [mm]
-#define TADA_ROBO
-//#define OTA_ROBO
+//#define TADA_ROBO
+#define OTA_ROBO
 
 //#define STEP_DEBUG
 //#define GARAGE_DEBUG
@@ -28,6 +28,7 @@ void CommandCalc::init( ){
   left_line_edge    = true;
   tail_stand_mode   = false;
   tail_lug_mode     = false;
+  ref_forward       = 0.0;
 
 #ifdef STEP_DEBUG
   Track_Mode = Return_to_Line;
@@ -169,7 +170,7 @@ void CommandCalc::Track_run( ) {
     forward =  0;
 #endif
 
-  	dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
+    dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
     if(dammy_line_value > 60){
       dammy_line_value = 60;
     }else if(dammy_line_value < 40){
@@ -394,11 +395,26 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
     break;
     
   case LineTrace1:
-    forward = 100;
+    if(mOdo > 50){
+      if(mSpeed > 250){
+	ref_forward = ref_forward;
+      }else{
+	ref_forward = ref_forward + START_FORWARD_STEP;
+      }
+    }else{
+      ref_forward = 0.0;
+    }
+
+    forward = (int)(ref_forward + START_ROBO_FORWARD_VAL + 0.5);
+
+    if(forward > 100){
+      forward = 100;
+    }
+
     LineTracerYawrate(mLinevalue);
     anglecommand = TAIL_ANGLE_RUN; 
     tail_stand_mode = false;
-		
+
     break;
 
   case MapTrace1:
@@ -609,7 +625,8 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_C2[3]={1458.8,  1246.03,  251.72          };
 	float Virtual_S3[4]={1614.4,  1048.17, 2255.65, 1492.0  };
 	float Virtual_C3[3]={3202.03,    0.0,  1750.0           };
-	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1760.0  };
+	//	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1760.0  };
+	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1810.0  };
 #endif
 
 
@@ -856,9 +873,32 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case Approach_to_Step:
-    
+
+    if(odo > ref_odo){
+      forward    =  20;
+      y_t        = -0.5*( RAD_89_DEG - angle);
+      yawratecmd = y_t;
+    }else{
+      forward =  70;
+      LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
+    }
+
+
+#ifdef OTA_ROBO
+    if((angle >  (RAD_90_DEG))&&(yawratecmd < 0) ){
+      yawratecmd = 0.0;
+    }
+#endif
+#ifdef TADA_ROBO
+    if((angle >  (RAD_90_DEG + 0.3))&&(yawratecmd < 0) ){
+      yawratecmd = 0.0;
+    }
+#endif
+
+    /*    
     if(odo > ref_odo){
       forward =  20;
+
     }else{
       forward =  70;
     }
@@ -876,6 +916,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       yawratecmd = 0.0;
     }
 #endif
+    */
 
     if(dansa){
       Step_Mode   = First_Dansa;

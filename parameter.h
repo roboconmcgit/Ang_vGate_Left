@@ -20,6 +20,9 @@ extern float WheelDiameter; //背面から見てタイヤの直径[mm]
 extern float WHEEL_R;       //radius of wheel[mm]
 extern int   RoboTread;      //トレッド長さ[mm]
 
+extern float START_ROBO_FORWARD_VAL;
+extern float START_FORWARD_STEP;
+
 extern int   CL_SNSR_GAIN_GRAY;
 
 
@@ -40,6 +43,8 @@ extern float MINUS_RAD_5_DEG; //
 extern float MINUS_RAD_15_DEG; //
 extern float MINUS_RAD_30_DEG; //
 
+extern float RAD_89_DEG;
+extern float RAD_87_DEG;
 extern float RAD_90_DEG;
 extern float RAD_120_DEG;
 extern float RAD_315_DEG;
