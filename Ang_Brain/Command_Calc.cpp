@@ -6,13 +6,13 @@
 using ev3api::Clock;
 
 #define liting_radius 10; // liting spot radius [mm]
+#define TADA_ROBO
+//#define OTA_ROBO
 
-//#define TADA_ROBO
-#define OTA_ROBO
 //#define STEP_DEBUG
 //#define GARAGE_DEBUG
 //#define DEBUG
-//#define LOG_RECORD
+
 
 Clock*       gClock;
 
@@ -28,7 +28,6 @@ void CommandCalc::init( ){
   left_line_edge    = true;
   tail_stand_mode   = false;
   tail_lug_mode     = false;
-  ref_forward       = 0.0;
 
 #ifdef STEP_DEBUG
   Track_Mode = Return_to_Line;
@@ -165,16 +164,16 @@ void CommandCalc::Track_run( ) {
 
   case Dead_Zone:
 
-    forward =  50;
+    forward =  70;
 #ifdef DEBUG
     forward =  0;
 #endif
 
-    dammy_line_value = 50 - 300*mYawangle;
-    if(dammy_line_value > 100){
-      dammy_line_value = 100;
-    }else if(dammy_line_value < 0){
-      dammy_line_value = 0;
+  	dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
+    if(dammy_line_value > 60){
+      dammy_line_value = 60;
+    }else if(dammy_line_value < 40){
+      dammy_line_value = 40;
     }
 
     LineTracerYawrate(dammy_line_value);
@@ -190,24 +189,44 @@ void CommandCalc::Track_run( ) {
 #ifdef DEBUG
     forward =  0;
 #endif
-    if(mYawangle < 0.16 && mLinevalue <20){
-      dammy_line_value = 80 - 300*mYawangle;
+//    if(mYawangle < DEAD_ZONE_ANGLE && mLinevalue <20){
+    if(mLinevalue <30){
+    	dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
       if(dammy_line_value > 100){
 	dammy_line_value = 100;
       }else if(dammy_line_value < 0){
 	dammy_line_value = 0;
       }
       LineTracerYawrate(dammy_line_value);
+      ref_odo = mOdo;
     }
     else{
-      LineTracerYawrate(mLinevalue);
+    	dammy_line_value = 50 - 300*(mYawangle - RTN_DET_ANGLE);
+      if(dammy_line_value > 100){
+	dammy_line_value = 100;
+      }else if(dammy_line_value < 50){
+	dammy_line_value = 50;
+      }
+   	if(dammy_line_value < mLinevalue){
+		dammy_line_value = mLinevalue;
+    }
+      LineTracerYawrate(dammy_line_value);
     }
     anglecommand = TAIL_ANGLE_RUN;
     tail_stand_mode = false;
     
-    if((mYawangle > 1) &&(mRobo_forward == 1)){
+    if(((LOST_ANGLE_UP - LOST_ANGLE_THS) > mYawangle) &&(mYawangle > 1) &&(mRobo_forward == 1)){
       Track_Mode = Go_Step;
     }
+
+  	if(mYawangle > LOST_ANGLE_UP){
+  		Track_Mode = Lost_Recov_1;
+  		ref_odo = mOdo;
+  	}
+  	if(mYawangle < LOST_ANGLE_LO){
+  		Track_Mode = Lost_Recov_2;
+  		ref_odo = mOdo;
+  	}
 
     break;
 
@@ -217,7 +236,36 @@ void CommandCalc::Track_run( ) {
     line_det = false;
     break;
 
-  case Approach_to_Garage:
+  case Lost_Recov_1:
+      dammy_line_value = 50 - 300*(mYawangle - (LOST_ANGLE_UP - LOST_ANGLE_THS));
+      if(dammy_line_value > 100){
+	dammy_line_value = 100;
+      }else if(dammy_line_value < 0){
+	dammy_line_value = 0;
+      }
+      LineTracerYawrate(dammy_line_value);
+  	if(mOdo > (ref_odo + LOST_RECOV_LENGTH_1)){
+      Track_Mode = Return_to_Line;
+  		ref_odo = mOdo;
+  	}
+    break;
+  
+
+  case Lost_Recov_2:
+      dammy_line_value = 50 - 300*(mYawangle - 1.6);
+      if(dammy_line_value > 70){
+	dammy_line_value = 70;
+      }else if(dammy_line_value < 30){
+	dammy_line_value = 30;
+      }
+      LineTracerYawrate(dammy_line_value);
+  	if(mOdo > (ref_odo + LOST_RECOV_LENGTH_2)){
+      Track_Mode = Return_to_Line;
+  		ref_odo = mOdo;
+  	}
+    break;
+
+    case Approach_to_Garage:
 
     ref_odo        = mOdo + STEP_TO_GARAGE_LENGTH;
     ref_x          = ref_x - GARAGE_X_POS;
@@ -337,7 +385,7 @@ void CommandCalc::Track_run( ) {
 }
 
 void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float xvalue, float yvalue, float yawangle) {
-  
+
   Strategy=static_cast<enumStrategy>(strategy_num);
 
   switch(Strategy){
@@ -346,24 +394,7 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
     break;
     
   case LineTrace1:
-
-    
-    if(mOdo > 50){
-      if(mSpeed > 250){
-	ref_forward = ref_forward;
-      }else{
-	ref_forward = ref_forward + START_FORWARD_STEP;
-      }
-    }else{
-      ref_forward = 0.0;
-    }
-
-    forward = (int)(ref_forward + START_ROBO_FORWARD_VAL + 0.5);
-
-    if(forward > 100){
-      forward = 100;
-      }
-
+    forward = 100;
     LineTracerYawrate(mLinevalue);
     anglecommand = TAIL_ANGLE_RUN; 
     tail_stand_mode = false;
@@ -578,8 +609,7 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_C2[3]={1458.8,  1246.03,  251.72          };
 	float Virtual_S3[4]={1614.4,  1048.17, 2255.65, 1492.0  };
 	float Virtual_C3[3]={3202.03,    0.0,  1750.0           };
-	//	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1760.0  };
-	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1810.0  };
+	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1760.0  };
 #endif
 
 
@@ -829,17 +859,23 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     
     if(odo > ref_odo){
       forward =  20;
-      //      y_t        = -0.5*( RAD_90_DEG - angle);
-      y_t        = -0.5*( RAD_89_DEG - angle);
-      yawratecmd = y_t;
     }else{
       forward =  70;
-      LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
     }
+#ifdef OTA_ROBO
+    LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
 
-    if((angle >  RAD_90_DEG)&&(yawratecmd < 0) ){
+    if((angle >  (RAD_90_DEG))&&(yawratecmd < 0) ){
       yawratecmd = 0.0;
     }
+#endif
+#ifdef TADA_ROBO
+    LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
+
+    if((angle >  (RAD_90_DEG + 0.3))&&(yawratecmd < 0) ){
+      yawratecmd = 0.0;
+    }
+#endif
 
     if(dansa){
       Step_Mode   = First_Dansa;
@@ -951,8 +987,6 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case First_Pre_Stand_Up:
-
-
     if(odo < ref_odo){
       forward = 15;
       y_t = -0.5*(2.5*PAI - angle);
@@ -965,6 +999,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       clock_start = gClock->now();
       Step_Mode = First_Dansa_Stand_Up;
     }
+    
     break;
 
   case First_Dansa_Stand_Up:
@@ -1212,34 +1247,3 @@ void CommandCalc::GarageRunner(){
 void CommandCalc::StopRobo(){
 
 }
-
-#ifdef LOG_RECORD
-
-void CommandCalc::saveData( ){
-
-  log_dat_00[log_cnt]  = forward;
-  log_dat_01[log_cnt]  = 0;
-  log_dat_02[log_cnt]  = 0;
-  log_fdat_00[log_cnt] = ref_forward;
-  log_fdat_01[log_cnt] = mOdo;
-  log_fdat_02[log_cnt] = mSpeed;
-
-  log_cnt++;
-  if (log_cnt == log_size){
-    log_cnt  = 0;
-  }
-}
-
-void CommandCalc::export_dat( ){
-    FILE* file_id;
-    file_id = fopen( "comand_dat.csv" ,"w");
-    fprintf(file_id, "forward,none,none2,ref_forward,mOdo,mSpeed\n");
-    int cnt;
-
-    for(cnt = 0; cnt < log_size ; cnt++){
-      fprintf(file_id, "%d,%d,%d,%f,%f,%f\n",log_dat_00[cnt],log_dat_01[cnt], log_dat_02[cnt],log_fdat_00[cnt],log_fdat_01[cnt], log_fdat_02[cnt]);
-    }
-    fclose(file_id);
-}
-
-#endif

@@ -7,7 +7,7 @@
 
 #ifndef EV3_APP_ANAGOBRAIN_H_
 #define EV3_APP_ANAGOBRAIN_H_
-//#define LOG_RECORD
+//#define DEQUE_EN
 
 #include <deque>
 
@@ -66,9 +66,6 @@ public:
     float x_D;
     float y_D;
 
-#ifdef LOG_RECORD
-    void dump_log();
-#endif
 
 private:
     void GetStrategy(int strategy_num, int virtualgate_num);//走行戦略を取得

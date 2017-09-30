@@ -2,8 +2,6 @@
 #include "util.h"
 #include "Brain_Calc_Library.h"
 
-//#define LOG_RECORD
-
 class CommandCalc {
 public:
 	explicit CommandCalc();//コンストラクタ
@@ -38,20 +36,6 @@ public:
 	float anglecommand;    //尻尾角度
 	bool  tail_stand_mode; //倒立走行フラグ
 	bool  tail_lug_mode; //倒立走行フラグ
-
-#ifdef LOG_RECORD
-    void  saveData( );
-    void  export_dat( );
-
-    int   log_size = 10000;
-    int   log_cnt = 0;
-    int   log_dat_00[10000];
-    int   log_dat_01[10000];
-    int   log_dat_02[10000];
-    float log_fdat_00[10000];
-    float log_fdat_01[10000];    
-    float log_fdat_02[10000];
-#endif
 
 private:
 
@@ -116,6 +100,8 @@ private:
       Get_Ref_Odo,
       Dead_Zone,
       Return_to_Line,
+      Lost_Recov_1,
+      Lost_Recov_2,
       Go_Step,
       Approach_to_Garage,
       Go_to_Garage,
@@ -187,7 +173,6 @@ private:
     int   mMax_Forward;
     float mMax_Yawrate;
     float mMin_Yawrate;
-    float ref_forward;
 
     //	bool tail_mode_lflag_calc; // 倒立走行フラグ 0817
     

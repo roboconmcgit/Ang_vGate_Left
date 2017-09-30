@@ -20,9 +20,6 @@ extern float WheelDiameter; //背面から見てタイヤの直径[mm]
 extern float WHEEL_R;       //radius of wheel[mm]
 extern int   RoboTread;      //トレッド長さ[mm]
 
-extern float START_ROBO_FORWARD_VAL;
-extern float START_FORWARD_STEP;
-
 extern int   CL_SNSR_GAIN_GRAY;
 
 
@@ -43,8 +40,6 @@ extern float MINUS_RAD_5_DEG; //
 extern float MINUS_RAD_15_DEG; //
 extern float MINUS_RAD_30_DEG; //
 
-extern float RAD_89_DEG;
-extern float RAD_87_DEG;
 extern float RAD_90_DEG;
 extern float RAD_120_DEG;
 extern float RAD_315_DEG;
@@ -55,6 +50,13 @@ extern float RAD_450_DEG;
 //Parameter of Course
 extern float FINAL_STRAIGHT_LENGTH;
 extern float DEAD_ZONE_LENGTH;
+extern float DEAD_ZONE_ANGLE;
+extern float LOST_ANGLE_UP;
+extern float LOST_ANGLE_LO;
+extern float LOST_ANGLE_THS;
+extern float LOST_RECOV_LENGTH_1;
+extern float LOST_RECOV_LENGTH_2;
+extern float RTN_DET_ANGLE;
 
 //Parameter of Step
 extern float STEP_START_LENGTH;

@@ -9,19 +9,7 @@ float WheelDiameter = 79.95;  //背面から見て左タイヤの直径[mm] 0817
 float WHEEL_R       = 39.975; //Wheel radius
 int   RoboTread     = 160; //トレッド長さ[mm]
 
-/* fail rate 20%
-float START_ROBO_FORWARD_VAL = 100;
-float START_FORWARD_STEP     = 0.1;
-*/
-
-/* fail rate under 10%
-float START_ROBO_FORWARD_VAL = 50;
-float START_FORWARD_STEP     = 0.1;
-*/
-float START_ROBO_FORWARD_VAL = 25;
-float START_FORWARD_STEP     = 0.1;
-
-int   CL_SNSR_GAIN_GRAY     =  2;
+int   CL_SNSR_GAIN_GRAY = 2;
 
 
 //Parameter of time length unit
@@ -40,8 +28,6 @@ float MINUS_RAD_5_DEG  = -0.0873; //
 float MINUS_RAD_15_DEG = -0.2618; //
 float MINUS_RAD_30_DEG = -0.5236; //
 
-float RAD_89_DEG  = 1.5533; //
-float RAD_87_DEG  = 1.5184; //
 float RAD_90_DEG  = 1.5708; //
 float RAD_120_DEG = 2.0944; //
 float RAD_315_DEG = 5.4978; //
@@ -51,27 +37,29 @@ float RAD_450_DEG = 7.8540;
 
 //Parameter of Course
 float FINAL_STRAIGHT_LENGTH = 1100.0;
-float DEAD_ZONE_LENGTH      =  400.0; //0910 tada
+float DEAD_ZONE_LENGTH      =  500.0; //0929 tada
+float DEAD_ZONE_ANGLE       = 0.5; //[rad] 0929 tada Heading Direction while Dead Zone (Less than 1.0)
+float LOST_ANGLE_UP         = 2.1; //[rad] 0929 tada Miss Course Desition Angle  Upper
+float LOST_ANGLE_LO         = -0.2; //[rad] 0929 tada Miss Course Desition Angle Lower
+float LOST_ANGLE_THS        = 0.05; //[rad] 0929 tada 
+float LOST_RECOV_LENGTH_1   = 400.0; //[mm] 0929 tada
+float LOST_RECOV_LENGTH_2   = 500.0; //[mm] 0929 tada
+float RTN_DET_ANGLE         = 1.5; //[rad] 0930 tada Return to Line detect absolute angle
 
 //Parameter of Step
 //float STEP_START_LENGTH     = 400;
-//float STEP_START_LENGTH     = 550;
-float STEP_START_LENGTH     = 500;
-
-//float FST_DANSA_POS         = 260;
-float FST_DANSA_POS         = 270;
+float STEP_START_LENGTH     = 550;
+float FST_DANSA_POS         = 260;
 float SCD_DANSA_POS         = 200;
 //float SCD_DANSA_ON_POS      =  60;
 float SCD_DANSA_ON_POS      =  70;
 
-//int   STEP_CLIMB_MAX_SPEED    = 35;
-int   STEP_CLIMB_MAX_SPEED    = 30;
+int   STEP_CLIMB_MAX_SPEED    = 35;
 
 //int   STBL_CNT_1st_DANSA      = 750;
 int   STBL_CNT_1st_DANSA      = 200;
 //int   STBL_CNT_2_DANSA      = 750;
-//int   STBL_CNT_2nd_DANSA      = 50;
-int   STBL_CNT_2nd_DANSA      = 400;
+int   STBL_CNT_2nd_DANSA      = 50;
 int   STBL_CNT_2nd_DANSA_ON   = 400;
 
 
