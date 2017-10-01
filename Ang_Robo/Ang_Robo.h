@@ -32,8 +32,9 @@ public:
 
     void init();
     void run();
-//    void setCommand(int forward, float yawratecmd, signed int anglecommand, float yawrate);
-    void setCommand(int forward, float yawratecmd, signed int anglecommand, float yawrate, bool tail_mode_lflag);//0816
+    void run_anago_run();
+
+    void setCommand(int forward, float yawratecmd, signed int tail_ang_req, float yawrate, bool tail_stand_mode, bool tail_lug_mode);
 
 
     void tail_control(signed int angle); //2017.07.28 kota copy from 3-apex
@@ -45,10 +46,7 @@ public:
 
     int   offset;    
     bool  balance_mode;
-    int   mmForward;
-    int   mmTurn;
-    float mmYawratecmd;//目標Yawrate
-    float mmYawrate;
+
     int   log_forward;
     int   log_turn;
     int   log_gyro;
@@ -66,11 +64,26 @@ private:
     Balancer* mBalancer;
     PID *gTail_pwm = new PID();
 
+    enum enumAnago_Mode{
+      Ang_Balance,
+      Ang_Tail_Down,
+      Ang_Tail_On,
+      Ang_Tail_Stand,
+      Ang_Stand_Vert,
+      Ang_Stand_to_Balance,
+      Ang_Tail_for_Run,
+      Ang_Debug_00
+    };
+    enumAnago_Mode  Anago_Mode;
+
+
+
     enum enumStand_Mode{
       Balance_Mode,
       Tail_Down,
       Tail_On,
       Tail_Stand,
+      Tail_Lug,
       Stand_Vert,
       Stand_to_Balance,
       Tail_for_Run,
@@ -86,19 +99,14 @@ private:
     float mYawratecmd;//目標Yawrate
     float mYawrate;
 
-    bool mTailModeFlag;//0816
+    bool  mTail_stand_mode;
+    bool  mTail_lug_mode;
    
-    signed int mAngleCommand;
-    //17.07.28 kota copy from 3-apex
-    float angle2_e;   /* angle2用変数型宣言 */
-    float angle2_eo1; /* angle2用変数型宣言 */
-    float angle2_eo2; /* angle2用変数型宣言 */
-    float pwm_o;      /* angle2用変数型宣言 */
-    float pwm2;
-    float pwm;
+    signed int mTail_ang_req;
+    float      tail_motor_pwm;
 
     float YawrateController(float yawrate, float yawrate_cmd);
-	float yaw_ctl_dt = 0.004;
+    float yaw_ctl_dt = 0.004;
 
     float turn_tmp;
     float r_yaw_rate = 0.0;

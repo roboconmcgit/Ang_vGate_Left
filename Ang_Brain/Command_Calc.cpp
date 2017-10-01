@@ -6,6 +6,9 @@
 using ev3api::Clock;
 
 #define liting_radius 10; // liting spot radius [mm]
+//#define TADA_ROBO
+#define OTA_ROBO
+
 //#define STEP_DEBUG
 //#define GARAGE_DEBUG
 //#define DEBUG
@@ -23,6 +26,9 @@ void CommandCalc::init( ){
   Step_Mode         = Step_Start;
   mYaw_angle_offset = 0.0;
   left_line_edge    = true;
+  tail_stand_mode   = false;
+  tail_lug_mode     = false;
+  ref_forward       = 0.0;
 
 #ifdef STEP_DEBUG
   Track_Mode = Return_to_Line;
@@ -31,7 +37,7 @@ void CommandCalc::init( ){
 
 #ifdef DEBUG
   //Track_Mode = Return_to_Line;
-  Track_Mode =  Track_Debug_00;
+  //  Track_Mode =  Track_Debug_00;
 #endif
 
 #ifdef GARAGE_DEBUG
@@ -97,8 +103,8 @@ void CommandCalc::Track_run( ) {
   case Start_to_1st_Corner:
     forward = mMax_Forward;
     LineTracerYawrate(mLinevalue);
-    anglecommand = TAIL_ANGLE_RUN; //0817 tada
-    tail_mode_lflag = false;
+    anglecommand = TAIL_ANGLE_RUN;
+    tail_stand_mode = false;
 
     if(mYawangle < -2){
       Track_Mode = Snd_Corner;
@@ -108,8 +114,8 @@ void CommandCalc::Track_run( ) {
   case Snd_Corner:
     forward =  mMax_Forward;
     LineTracerYawrate(mLinevalue);
-    anglecommand = TAIL_ANGLE_RUN; //0817 tada
-    tail_mode_lflag = false;
+    anglecommand = TAIL_ANGLE_RUN;
+    tail_stand_mode = false;
 
     if(mYawangle > 2){
       Track_Mode = Final_Corner;
@@ -119,8 +125,8 @@ void CommandCalc::Track_run( ) {
   case Final_Corner:
     forward =  mMax_Forward;
     LineTracerYawrate(mLinevalue);
-    anglecommand = TAIL_ANGLE_RUN; //0817 tada
-    tail_mode_lflag = false;
+    anglecommand = TAIL_ANGLE_RUN;
+    tail_stand_mode = false;
 
     if((mYawangle < 1) &&(mRobo_forward == 1)){
       Track_Mode = Final_Straight;
@@ -131,8 +137,8 @@ void CommandCalc::Track_run( ) {
   case Final_Straight:
     forward =  mMax_Forward;
     LineTracerYawrate(mLinevalue);
-    anglecommand = TAIL_ANGLE_RUN; //0817 tada
-    tail_mode_lflag = false;
+    anglecommand = TAIL_ANGLE_RUN;
+    tail_stand_mode = false;
     
     if(mOdo > ref_odo){
       Track_Mode = Dead_Zone;
@@ -141,6 +147,7 @@ void CommandCalc::Track_run( ) {
 
     break;
 
+    //change map mode to track mode from here.
   case Get_Ref_Odo:
     forward =  50;
     dammy_line_value = 50 - 300*mYawangle;
@@ -157,12 +164,17 @@ void CommandCalc::Track_run( ) {
     break;
 
   case Dead_Zone:
-    forward =  50;
-    dammy_line_value = 50 - 300*mYawangle;
-    if(dammy_line_value > 100){
-      dammy_line_value = 100;
-    }else if(dammy_line_value < 0){
-      dammy_line_value = 0;
+
+    forward =  70;
+#ifdef DEBUG
+    forward =  0;
+#endif
+
+    dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
+    if(dammy_line_value > 60){
+      dammy_line_value = 60;
+    }else if(dammy_line_value < 40){
+      dammy_line_value = 40;
     }
 
     LineTracerYawrate(dammy_line_value);
@@ -175,24 +187,47 @@ void CommandCalc::Track_run( ) {
   case Return_to_Line:
     //    forward =  50; // 0910 tada
     forward =  20; // 0910 tada
-    if(mYawangle < 0.16 && mLinevalue <20){
-      dammy_line_value = 80 - 300*mYawangle;
+#ifdef DEBUG
+    forward =  0;
+#endif
+//    if(mYawangle < DEAD_ZONE_ANGLE && mLinevalue <20){
+    if(mLinevalue <30){
+    	dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
       if(dammy_line_value > 100){
 	dammy_line_value = 100;
       }else if(dammy_line_value < 0){
 	dammy_line_value = 0;
       }
       LineTracerYawrate(dammy_line_value);
+      ref_odo = mOdo;
     }
     else{
-      LineTracerYawrate(mLinevalue);
+    	dammy_line_value = 50 - 300*(mYawangle - RTN_DET_ANGLE);
+      if(dammy_line_value > 100){
+	dammy_line_value = 100;
+      }else if(dammy_line_value < 50){
+	dammy_line_value = 50;
+      }
+   	if(dammy_line_value < mLinevalue){
+		dammy_line_value = mLinevalue;
     }
-    anglecommand = TAIL_ANGLE_RUN; //0817 tada
-    tail_mode_lflag = false;
+      LineTracerYawrate(dammy_line_value);
+    }
+    anglecommand = TAIL_ANGLE_RUN;
+    tail_stand_mode = false;
     
-    if((mYawangle > 1) &&(mRobo_forward == 1)){
+    if(((LOST_ANGLE_UP - LOST_ANGLE_THS) > mYawangle) &&(mYawangle > 1) &&(mRobo_forward == 1)){
       Track_Mode = Go_Step;
     }
+
+  	if(mYawangle > LOST_ANGLE_UP){
+  		Track_Mode = Lost_Recov_1;
+  		ref_odo = mOdo;
+  	}
+  	if(mYawangle < LOST_ANGLE_LO){
+  		Track_Mode = Lost_Recov_2;
+  		ref_odo = mOdo;
+  	}
 
     break;
 
@@ -202,7 +237,36 @@ void CommandCalc::Track_run( ) {
     line_det = false;
     break;
 
-  case Approach_to_Garage:
+  case Lost_Recov_1:
+      dammy_line_value = 50 - 300*(mYawangle - (LOST_ANGLE_UP - LOST_ANGLE_THS));
+      if(dammy_line_value > 100){
+	dammy_line_value = 100;
+      }else if(dammy_line_value < 0){
+	dammy_line_value = 0;
+      }
+      LineTracerYawrate(dammy_line_value);
+  	if(mOdo > (ref_odo + LOST_RECOV_LENGTH_1)){
+      Track_Mode = Return_to_Line;
+  		ref_odo = mOdo;
+  	}
+    break;
+  
+
+  case Lost_Recov_2:
+      dammy_line_value = 50 - 300*(mYawangle - 1.6);
+      if(dammy_line_value > 70){
+	dammy_line_value = 70;
+      }else if(dammy_line_value < 30){
+	dammy_line_value = 30;
+      }
+      LineTracerYawrate(dammy_line_value);
+  	if(mOdo > (ref_odo + LOST_RECOV_LENGTH_2)){
+      Track_Mode = Return_to_Line;
+  		ref_odo = mOdo;
+  	}
+    break;
+
+    case Approach_to_Garage:
 
     ref_odo        = mOdo + STEP_TO_GARAGE_LENGTH;
     ref_x          = ref_x - GARAGE_X_POS;
@@ -250,7 +314,7 @@ void CommandCalc::Track_run( ) {
 
   case Garage_Tail_On:
 
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
     forward         = 0;
     yawratecmd      = 0;
 
@@ -264,7 +328,7 @@ void CommandCalc::Track_run( ) {
     break;
 
   case Garage_In:
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
     if(mYawangle >= ref_angle){
       forward     = 0;
       yawratecmd  = 0;
@@ -279,7 +343,7 @@ void CommandCalc::Track_run( ) {
     break;
 
   case Garage_Stop:
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
     if(gClock->now() - clock_start > 500){
 	forward    = -10;
 	yawratecmd = 0;
@@ -316,7 +380,7 @@ void CommandCalc::Track_run( ) {
     forward = 0;
     LineTracerYawrate(mLinevalue);
     anglecommand = TAIL_ANGLE_RUN; 
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
     break;
   }
 }
@@ -325,111 +389,125 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 
   Strategy=static_cast<enumStrategy>(strategy_num);
 
-	switch(Strategy){
-	case StartDash:
-		StartDashRunner();
-	break;
+  switch(Strategy){
+  case StartDash:
+    StartDashRunner();
+    break;
+    
+  case LineTrace1:
+    if(mOdo > 20){
+      if(mSpeed > 250){
+	ref_forward = ref_forward;
+      }else{
+	ref_forward = ref_forward + START_FORWARD_STEP;
+      }
+    }else{
+      ref_forward = 0.0;
+    }
 
-	case LineTrace1:
-	  forward = 100;
-	  LineTracerYawrate(mLinevalue);
-	  anglecommand = TAIL_ANGLE_RUN; 
-	  tail_mode_lflag = false;
-		
-	break;
+    forward = (int)(ref_forward + START_ROBO_FORWARD_VAL + 0.5);
 
+    if(forward > 100){
+      forward = 100;
+    }
 
-	case MapTrace1:
-		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-	break;
+    LineTracerYawrate(mLinevalue);
+    anglecommand = TAIL_ANGLE_RUN; 
+    tail_stand_mode = false;
 
-	case MapTrace2:
-		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-	break;
+    break;
 
-	case MapTrace3:
-		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-	break;
+  case MapTrace1:
+    forward = 100; //0827 tada
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    break;
 
-	case MapTrace4:
-		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-	break;
+  case MapTrace2:
+    forward = 100; //0827 tada
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    break;
 
-	case MapTrace5:
-		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-	break;
+  case MapTrace3:
+    forward = 100; //0827 tada
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    break;
 
-	case MapTrace6:
-		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-	break;
+  case MapTrace4:
+    forward = 100; //0827 tada
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    break;
 
-	case MapTrace7:
-		forward = 100; //0827 tada
-		MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-	break;
+  case MapTrace5:
+    forward = 100; //0827 tada
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    break;
 
-	case MapTrace8:
-		forward = 100; //0827 tada
-		if(mLinevalue > 20){
-			LineTracerYawrate(mLinevalue);
-		}
-		else{
-			MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
-		}
-		anglecommand = TAIL_ANGLE_RUN; //0827 tada
-		tail_mode_lflag = false; //0827 tada
-		Track_Mode = Get_Ref_Odo;//0910 tada
-	break;
+  case MapTrace6:
+    forward = 100; //0827 tada
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    break;
 
-	case Goal:
+  case MapTrace7:
+    forward = 100; //0827 tada
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    break;
 
-	break;
+  case MapTrace8:
+    forward = 100; //0827 tada
+    if(mLinevalue > 20){
+      LineTracerYawrate(mLinevalue);
+    }
+    else{
+      MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
+    }
+    anglecommand = TAIL_ANGLE_RUN; //0827 tada
+    tail_stand_mode = false; //0827 tada
+    Track_Mode = Get_Ref_Odo;//0910 tada
+    break;
+    
+  case Goal:
 
-	case Goal2Step:
+    break;
 
-	break;
+  case Goal2Step:
 
-	case Step:
-	  gForward->init_pid(0.1,0.005,0.05,dT_4ms);
-	  StepRunner(mLinevalue, mOdo, mYawangle, mDansa);
-	break;
+    break;
 
-	case LookUpGate:
-		LookUpGateRunner();
-	break;
+  case Step:
+    gForward->init_pid(0.1,0.005,0.05,dT_4ms);
+    StepRunner(mLinevalue, mOdo, mYawangle, mDansa);
+    break;
 
-	case Garage:
-		GarageRunner();
-	break;
+  case LookUpGate:
+    LookUpGateRunner();
+    break;
 
-	case Stop:
-		StopRobo();
-	break;
+  case Garage:
+    GarageRunner();
+    break;
 
-	default:
-	  forward = 10;
-	break;
-	}
+  case Stop:
+    StopRobo();
+    break;
+
+  default:
+    forward = 10;
+    break;
+  }
 
 }
 
@@ -529,13 +607,29 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 	float Virtual_S4[4]={3302.03,1880.0,4600.0,2050.0};
 	*/
 ///*
-	float Virtual_S1[4]={735.96,415.74,735.96, 2558.54};
-	float Virtual_C1[3]={1083.86,2558.54,347.9};
-	float Virtual_S2[4]={1426.36,2494.88,1210.99,1290.24};
-	float Virtual_C2[3]={1458.8,1246.03,251.72};
-	float Virtual_S3[4]={1614.4,1048.17,2255.65,1552.45};
-	float Virtual_C3[3]={3202.03,349.04,1530.96};
-	float Virtual_S4[4]={3202.03,1880.0,4600.0,2050.0};
+
+#ifdef TADA_ROBO
+	float Virtual_S1[4]={735.96,   415.74,  735.96, 2558.54 };
+	float Virtual_C1[3]={1083.86, 2558.54,  347.9           };
+	float Virtual_S2[4]={1426.36, 2494.88, 1210.99, 1290.24 };
+	float Virtual_C2[3]={1458.8,  1246.03,  251.72          };
+	float Virtual_S3[4]={1614.4,  1048.17, 2255.65, 1552.45 };
+	float Virtual_C3[3]={3202.03,  349.04, 1530.96          };
+	float Virtual_S4[4]={3202.03, 1880.0,  4600.0,  2050.0  };
+#endif
+
+#ifdef OTA_ROBO
+	float Virtual_S1[4]={735.96,   415.74,  735.96, 2558.54 };
+	float Virtual_C1[3]={1083.86, 2558.54,  347.9           };
+	float Virtual_S2[4]={1426.36, 2494.88, 1210.99, 1290.24 };
+	float Virtual_C2[3]={1458.8,  1246.03,  251.72          };
+	float Virtual_S3[4]={1614.4,  1048.17, 2255.65, 1492.0  };
+	float Virtual_C3[3]={3202.03,    0.0,  1750.0           };
+	//	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1760.0  };
+	float Virtual_S4[4]={3202.03, 1750.0,  4600.0,  1810.0  };
+#endif
+
+
 //*/
 	float extend_gain = 1.0;
 	float Virtual_point_dist = 50.0;
@@ -779,18 +873,28 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case Approach_to_Step:
-    
+
     if(odo > ref_odo){
-      forward =  20;
+      forward    =  20;
+      y_t        = -0.5*( RAD_89_DEG - angle);
+      yawratecmd = y_t;
     }else{
-      forward =  70;
+      //      forward =  70;
+      forward =  30;
+      LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
     }
 
-    LineTracerYawrate((CL_SNSR_GAIN_GRAY * line_value));
 
-    if((angle >  RAD_90_DEG)&&(yawratecmd < 0) ){
+#ifdef OTA_ROBO
+    if((angle >  (RAD_90_DEG))&&(yawratecmd < 0) ){
       yawratecmd = 0.0;
     }
+#endif
+#ifdef TADA_ROBO
+    if((angle >  (RAD_90_DEG + 0.3))&&(yawratecmd < 0) ){
+      yawratecmd = 0.0;
+    }
+#endif
 
     if(dansa){
       Step_Mode   = First_Dansa;
@@ -817,7 +921,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     
     if(dansa_cnt < 50){
-      if(stable_cnt > 750){ //3sec // it would be chanced to Stable flag
+      if(stable_cnt > STBL_CNT_1st_DANSA){ //3sec // it would be chanced to Stable flag
 	forward = 0;
 	yawratecmd = 0;
 	ref_tail_angle =  TAIL_ANGLE_RUN;
@@ -827,7 +931,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	stable_cnt = 0;
       }else{
 	forward    = gForward->calc_pid(ref_odo, odo);
-	forward    = forward * 0.3;
+	forward     = forward * 0.4;
+	if(forward > STEP_CLIMB_MAX_SPEED){
+	  forward     = STEP_CLIMB_MAX_SPEED;
+	}
+
 	yawratecmd = 0;
 	clock_start = gClock->now();
       }
@@ -857,7 +965,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       forward    = 10;
       yawratecmd = 0;
     }else{
-      tail_mode_lflag = true;
+      tail_stand_mode = true;
       forward    = 0;
       yawratecmd = 0;
     }
@@ -888,7 +996,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case First_Turn:
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
     if(angle >= ref_angle){
       Step_Mode = First_Pre_Stand_Up;
       clock_start = gClock->now();
@@ -906,11 +1014,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       forward = 15;
       y_t = -0.5*(2.5*PAI - angle);
       yawratecmd = y_t;
-      tail_mode_lflag = true;
+      tail_stand_mode = true;
     }else{
       forward    = 0;
       yawratecmd = 0;
-      tail_mode_lflag = true;
+      tail_stand_mode = true;
       clock_start = gClock->now();
       Step_Mode = First_Dansa_Stand_Up;
     }
@@ -923,7 +1031,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       forward         = 0;
       yawratecmd      = 0;
       anglecommand    = TAIL_ANGLE_RUN;
-      tail_mode_lflag = false;
+      tail_stand_mode = false;
       if(mRobo_balance_mode == true){
 	forward      = 0;
 	yawratecmd   = 0;
@@ -932,14 +1040,16 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	clock_start  = gClock->now();
       }
     }else{
-      tail_mode_lflag = true;
+      tail_stand_mode = true;
       forward         = 0;
       yawratecmd      = 0;
     }
     break;
 
   case Approach_to_2nd_Step:
-    if((gClock->now() - clock_start) < 1000){
+    //    if((gClock->now() - clock_start) < 1000){
+    if((gClock->now() - clock_start) < 100){
+
       forward      = 0;
       yawratecmd   = 0;
       anglecommand = TAIL_ANGLE_RUN;
@@ -983,7 +1093,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }
     
     if(dansa_cnt < 50){
-      if(stable_cnt > 750){ //3sec
+      if(stable_cnt > STBL_CNT_2nd_DANSA){
 	forward    = 0;
 	yawratecmd = 0;
 	ref_tail_angle =  TAIL_ANGLE_RUN;
@@ -995,7 +1105,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	gForward->init_pid(0.1,0.01,0.001,dT_4ms);
       }else{
 	forward     = gForward->calc_pid(ref_odo, odo);
-	forward     = forward * 0.2;
+	//	forward     = forward * 0.2;
+	forward     = forward * 0.4;
+	if(forward > STEP_CLIMB_MAX_SPEED){
+	  forward     = STEP_CLIMB_MAX_SPEED;
+	}
 	yawratecmd  = 0;
 	clock_start = gClock->now();
       }
@@ -1012,7 +1126,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case Second_Dansa_On:
     forward      = gForward->calc_pid(ref_odo, odo);
-    forward      = forward * 0.1;
+    forward      = forward * 0.2;
     yawratecmd   = 0;
     anglecommand = ref_tail_angle;
 
@@ -1020,7 +1134,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       stable_cnt++;
     }
 
-    if(stable_cnt > 750){ //3sec
+    if(stable_cnt > STBL_CNT_2nd_DANSA_ON){
       Step_Mode = Second_Dansa_Tail_On;
       clock_start = gClock->now();
       forward    = 0;
@@ -1031,11 +1145,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
   case Second_Dansa_Tail_On:
     forward    = 0;
     yawratecmd = 0;
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
     if(mRobo_balance_mode == false){
       forward    = 0;
       yawratecmd = 0;
-      tail_mode_lflag = true;
+      tail_stand_mode = true;
       Step_Mode = Second_Turn;
       clock_start = gClock->now();
       ref_angle = angle + RAD_450_DEG + RAD_15_DEG;
@@ -1043,7 +1157,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     break;
 
   case Second_Turn:
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
     if((gClock->now() - clock_start) > 500){
       if(angle >= ref_angle){
 	Step_Mode   = Second_Pre_Stand_Up;
@@ -1068,13 +1182,13 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     forward         = 10;
     y_t             = -10.0*(5*PAI - angle);
     yawratecmd      = y_t;
-    tail_mode_lflag = true;
+    tail_stand_mode = true;
 
 
     if((gClock->now() - clock_start) > 2500){
       forward         = 0;
       yawratecmd      = 0;
-      tail_mode_lflag = true;
+      tail_stand_mode = true;
       clock_start     = gClock->now();
       Step_Mode       = Second_Dansa_Stand_Up;
       ref_odo         = odo + 150;
@@ -1084,11 +1198,12 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
   case Second_Dansa_Stand_Up:
 
-    if((gClock->now() - clock_start) > 1000){
+    //    if((gClock->now() - clock_start) > 1000){
+    if((gClock->now() - clock_start) > 500){
       forward    = 0;
       yawratecmd = 0;
       anglecommand = TAIL_ANGLE_RUN;
-      tail_mode_lflag = false;
+      tail_stand_mode = false;
 
       if(mRobo_balance_mode == true){
 	forward    = 40;
@@ -1099,7 +1214,7 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       }
 
     }else{
-      tail_mode_lflag = true;
+      tail_stand_mode = true;
       forward         = 0;
       yawratecmd      = 0;
     }

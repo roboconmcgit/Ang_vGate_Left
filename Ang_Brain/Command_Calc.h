@@ -34,10 +34,10 @@ public:
 	int   forward;         //前進目標値
 	float yawratecmd;      //目標ヨーレート
 	float anglecommand;    //尻尾角度
-	bool  tail_mode_lflag; //倒立走行フラグ
+	bool  tail_stand_mode; //倒立走行フラグ
+	bool  tail_lug_mode; //倒立走行フラグ
 
 private:
-
 
     void StartDashRunner();                              //スタートダッシュ
     void LineTracer(int line_value, float traceforward); //ライントレース
@@ -100,6 +100,8 @@ private:
       Get_Ref_Odo,
       Dead_Zone,
       Return_to_Line,
+      Lost_Recov_1,
+      Lost_Recov_2,
       Go_Step,
       Approach_to_Garage,
       Go_to_Garage,
@@ -171,6 +173,7 @@ private:
     int   mMax_Forward;
     float mMax_Yawrate;
     float mMin_Yawrate;
+    float ref_forward;
 
     //	bool tail_mode_lflag_calc; // 倒立走行フラグ 0817
     

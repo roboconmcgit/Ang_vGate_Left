@@ -12,7 +12,6 @@ void Ang_Brain::init() {
   gCommandCalc->init();
 }
 
-//ふるまいはコミュニケーション図に記載
 void Ang_Brain::run() {
   
   //位置推定->走行戦略判定
@@ -42,19 +41,21 @@ void Ang_Brain::run() {
 			       gStrategyDet->Min_Yawrate
 			       );      //6: ロボットの現在情報を取得
 
-	
-	if(Strategy == Goal){
+  if(Strategy == Goal){
     gCommandCalc->Track_run();
-	}
-	else{
-		  gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
-	}
-  
+  }
+  else{
+    gCommandCalc->StrategyCalcRun(StrategyNum,VirtualGateNum,mXvalue,mYvalue,mYawangle);//7: 走行戦略を計算
+  }
+
   GetCalcResult(gCommandCalc->forward,
 		gCommandCalc->yawratecmd,
 		gCommandCalc->anglecommand,
-		gCommandCalc->tail_mode_lflag);   //8: 走行戦略の計算結果を取得
+		gCommandCalc->tail_stand_mode,
+		gCommandCalc->tail_lug_mode);   //8: 走行戦略の計算結果を取得
 }
+
+
 
 void Ang_Brain::setEyeCommand(int linevalue,
 			      float xvalue,
@@ -108,11 +109,14 @@ void Ang_Brain::GetStrategy(int strategy_num, int virtualgate_num){
 void Ang_Brain::GetCalcResult(int forward_calc,
 			      float yawratecmd_calc,
 			      float anglecommand_calc,
-			      bool tail_mode_lflag_calc){
+			      bool tail_stand_mode_calc,
+			      bool tail_lug_mode_calc){
   
   forward         = forward_calc;
   yawratecmd      = yawratecmd_calc;
   anglecommand    = anglecommand_calc;
-  tail_mode_lflag = tail_mode_lflag_calc;
+  tail_stand_mode = tail_stand_mode_calc;
+  tail_lug_mode   = tail_lug_mode_calc;
+
 }
 
