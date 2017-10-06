@@ -1,3 +1,8 @@
+#define OTA_ROBO
+//define TADA_ROBO
+//#define TOMY_ROBO
+
+
 //Parameter of Robo
 int TAIL_ANGLE_STAND_UP = 98; /* 完全停止時の角度[度]     */
 int TAIL_ANGLE_RUN      =  3; /* バランス走行時の角度[度] */
@@ -44,14 +49,15 @@ float MINUS_RAD_5_DEG  = -0.0873; //
 float MINUS_RAD_15_DEG = -0.2618; //
 float MINUS_RAD_30_DEG = -0.5236; //
 
-float RAD_89_DEG  = 1.5533; //
-float RAD_87_DEG  = 1.5184; //
-float RAD_90_DEG  = 1.5708; //
-float RAD_120_DEG = 2.0944; //
-float RAD_315_DEG = 5.4978; //
-float RAD_345_DEG = 6.0214; //
-float RAD_360_DEG = 6.2832; //
-float RAD_450_DEG = 7.8540;
+float RAD_89_DEG   = 1.5533; //
+float RAD_88p5_DEG = 1.5446; //
+float RAD_87_DEG   = 1.5184; //
+float RAD_90_DEG   = 1.5708; //
+float RAD_120_DEG  = 2.0944; //
+float RAD_315_DEG  = 5.4978; //
+float RAD_345_DEG  = 6.0214; //
+float RAD_360_DEG  = 6.2832; //
+float RAD_450_DEG  = 7.8540;
 
 //Parameter of Course
 float FINAL_STRAIGHT_LENGTH = 1100.0;
@@ -77,7 +83,8 @@ float SCD_DANSA_POS         = 200;
 float SCD_DANSA_ON_POS      =  70;
 
 //int   STEP_CLIMB_MAX_SPEED  = 35;
-int   STEP_CLIMB_MAX_SPEED    = 30;
+//int   STEP_CLIMB_MAX_SPEED    = 30;
+int   STEP_CLIMB_MAX_SPEED    = 25;
 
 //int   STBL_CNT_1st_DANSA    = 750;
 int   STBL_CNT_1st_DANSA      = 200;
@@ -93,8 +100,13 @@ int   STBL_CNT_2nd_DANSA_ON   = 400;
 float STEP_TO_GARAGE_LENGTH = 11100;
 
 //float GARAGE_X_POS          = 1100;
-float GARAGE_X_POS          = 1000;
-float GARAGE_LENGTH         =  150;
+//float GARAGE_X_POS          = 1000;
+//float GARAGE_X_POS          = 980;
+float GARAGE_X_POS          = 950;
+
+//float GARAGE_LENGTH         =  150;
+//float GARAGE_LENGTH         =  50;
+float GARAGE_LENGTH         =  70;
 
 //Parameter of Area
 
@@ -159,6 +171,8 @@ float Gate78Area[4]={2487.29, 3302.03, 0.0, 2497.44};
 float Gate89Area[4]={3302.03, 4200.0, 0.0, 2497.44};
 */
 ///*
+
+#ifdef TADA_ROBO
 float MapTraceArea1[4]={   0.0,   936.52, 2000.0,  2558.54};
 float MapTraceArea2[4]={   0.0,  2100.0,  2558.54, 3800.0};
 float MapTraceArea3[4]={ 936.52, 2100.0,  2497.44, 2558.54};
@@ -176,4 +190,39 @@ float Gate56Area[4]   ={ 936.52, 1614.4,     0.0,  1290.24};
 float Gate67Area[4]   ={1614.4,  2255.65,    0.0,  2497.44};
 float Gate78Area[4]   ={2255.65, 3202.03,    0.0,  2497.44};
 float Gate89Area[4]   ={3202.03, 4200.0,     0.0,  2497.44};
-//*/
+#endif
+
+#ifdef OTA_ROBO
+float MapTraceArea1[4]={   0.0,   936.52, 2000.0,  2558.54};
+float MapTraceArea2[4]={   0.0,  2100.0,  2558.54, 3800.0};
+float MapTraceArea3[4]={ 936.52, 2100.0,  2497.44, 2558.54};
+
+/*
+float MapTraceArea4[4]={ 936.52, 1614.4,  1290.24, 2497.44};
+float MapTraceArea5[4]={ 936.52, 1614.4,     0.0,  1290.24};
+float MapTraceArea6[4]={1614.4,  2255.65,    0.0,  2497.44};
+*/
+float MapTraceArea4[4]={ 936.52, 1564.4,  1290.24, 2497.44};
+float MapTraceArea5[4]={ 936.52, 1564.4,     0.0,  1290.24};
+float MapTraceArea6[4]={1564.4,  2255.65,    0.0,  2497.44};
+
+
+float MapTraceArea7[4]={2255.65, 3202.03,    0.0,  2497.44};
+float MapTraceArea8[4]={3202.03, 4200.0,     0.0,  2497.44};
+
+float Gate12Area[4]   ={   0.0,   936.52, 2000.0,  2558.54};
+float Gate23Area[4]   ={   0.0,  2100.0,  2558.54, 3800.0};
+float Gate34Area[4]   ={ 936.52, 2100.0,  2497.44, 2558.54};
+/*
+float Gate45Area[4]   ={ 936.52, 1614.4,  1290.24, 2497.44};
+float Gate56Area[4]   ={ 936.52, 1614.4,     0.0,  1290.24};
+float Gate67Area[4]   ={1614.4,  2255.65,    0.0,  2497.44};
+*/
+
+float Gate45Area[4]   ={ 936.52, 1564.4,  1290.24, 2497.44};
+float Gate56Area[4]   ={ 936.52, 1564.4,     0.0,  1290.24};
+float Gate67Area[4]   ={1564.4,  2255.65,    0.0,  2497.44};
+
+float Gate78Area[4]   ={2255.65, 3202.03,    0.0,  2497.44};
+float Gate89Area[4]   ={3202.03, 4200.0,     0.0,  2497.44};
+#endif
