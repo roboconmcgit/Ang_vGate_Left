@@ -44,6 +44,7 @@ float RAD_1_DEG   = 0.0175; //deg@1rad
 float RAD_5_DEG   = 0.0873; //
 float RAD_15_DEG  = 0.2618; //
 float RAD_30_DEG  = 0.5236; //
+float RAD_45_DEG  = 0.7854; //
 
 float MINUS_RAD_5_DEG  = -0.0873; //
 float MINUS_RAD_15_DEG = -0.2618; //
@@ -84,7 +85,8 @@ float SCD_DANSA_ON_POS      =  70;
 
 //int   STEP_CLIMB_MAX_SPEED  = 35;
 //int   STEP_CLIMB_MAX_SPEED    = 30;
-int   STEP_CLIMB_MAX_SPEED    = 25;
+//int   STEP_CLIMB_MAX_SPEED    = 25;
+int   STEP_CLIMB_MAX_SPEED    = 20;
 
 //int   STBL_CNT_1st_DANSA    = 750;
 int   STBL_CNT_1st_DANSA      = 200;

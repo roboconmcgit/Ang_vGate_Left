@@ -149,6 +149,8 @@ void CommandCalc::Track_run( ) {
     break;
 
     //change map mode to track mode from here.
+
+
   case Get_Ref_Odo:
     forward =  50;
     dammy_line_value = 50 - 300*mYawangle;
@@ -167,11 +169,11 @@ void CommandCalc::Track_run( ) {
   case Dead_Zone:
 
     forward =  70;
-#ifdef DEBUG
-    forward =  0;
-#endif
 
-    dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
+    //    dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
+    //    dammy_line_value = 50 - 300*(mYawangle - RAD_15_DEG);
+    dammy_line_value = 50 - 300*(mYawangle - RAD_5_DEG);
+
     if(dammy_line_value > 60){
       dammy_line_value = 60;
     }else if(dammy_line_value < 40){
@@ -188,12 +190,14 @@ void CommandCalc::Track_run( ) {
   case Return_to_Line:
     //    forward =  50; // 0910 tada
     forward =  20; // 0910 tada
-#ifdef DEBUG
-    forward =  0;
-#endif
+
 //    if(mYawangle < DEAD_ZONE_ANGLE && mLinevalue <20){
+
     if(mLinevalue <30){
-    	dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
+      //      dammy_line_value = 50 - 300*(mYawangle - DEAD_ZONE_ANGLE);
+      //      dammy_line_value = 50 - 300*(mYawangle - RAD_15_DEG);
+      dammy_line_value = 50 - 300*(mYawangle - RAD_45_DEG);
+
       if(dammy_line_value > 100){
 	dammy_line_value = 100;
       }else if(dammy_line_value < 0){
@@ -203,16 +207,21 @@ void CommandCalc::Track_run( ) {
       ref_odo = mOdo;
     }
     else{
-    	dammy_line_value = 50 - 300*(mYawangle - RTN_DET_ANGLE);
+      //    	dammy_line_value = 50 - 300*(mYawangle - RTN_DET_ANGLE);
+      /*
+    	dammy_line_value = 50 - 300*(mYawangle - RAD_45_DEG);
       if(dammy_line_value > 100){
 	dammy_line_value = 100;
       }else if(dammy_line_value < 50){
 	dammy_line_value = 50;
       }
-   	if(dammy_line_value < mLinevalue){
-		dammy_line_value = mLinevalue;
-    }
-      LineTracerYawrate(dammy_line_value);
+      if(dammy_line_value < mLinevalue){
+	dammy_line_value = mLinevalue;
+      }
+      */
+
+      //LineTracerYawrate(dammy_line_value);
+      LineTracerYawrate(mLinevalue);
     }
     anglecommand = TAIL_ANGLE_RUN;
     tail_stand_mode = false;
@@ -221,16 +230,18 @@ void CommandCalc::Track_run( ) {
       Track_Mode = Go_Step;
     }
 
-  	if(mYawangle > LOST_ANGLE_UP){
-  		Track_Mode = Lost_Recov_1;
-  		ref_odo = mOdo;
-  	}
-  	if(mYawangle < LOST_ANGLE_LO){
-  		Track_Mode = Lost_Recov_2;
-  		ref_odo = mOdo;
-  	}
+    if(mYawangle > LOST_ANGLE_UP){
+      Track_Mode = Lost_Recov_1;
+      ref_odo = mOdo;
+    }
+    if(mYawangle < LOST_ANGLE_LO){
+      Track_Mode = Lost_Recov_2;
+      ref_odo = mOdo;
+    }
 
     break;
+
+
 
   case Go_Step:
     StepRunner(mLinevalue, mOdo, mYawangle, mDansa);
@@ -266,6 +277,7 @@ void CommandCalc::Track_run( ) {
   		ref_odo = mOdo;
   	}
     break;
+
 
     case Approach_to_Garage:
 
@@ -484,12 +496,18 @@ void CommandCalc::StrategyCalcRun(int strategy_num, int virtualgate_num, float x
 
   case MapTrace8:
     forward = 100; //0827 tada
+
+    /* 1007 ota*/
+    /*
     if(mLinevalue > 20){
       LineTracerYawrate(mLinevalue);
     }
     else{
       MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle); //0827 tada
     }
+    */
+    MapTracer(virtualgate_num, mXvalue, mYvalue, mYawangle);
+
     anglecommand = TAIL_ANGLE_RUN; //0827 tada
     tail_stand_mode = false; //0827 tada
     Track_Mode = Get_Ref_Odo;//0910 tada
