@@ -30,7 +30,7 @@ void CommandCalc::init( ){
   tail_stand_mode   = false;
   tail_lug_mode     = false;
   ref_forward       = 0.0;
-
+  bat_mv            = ev3_battery_voltage_mV();
 #ifdef STEP_DEBUG
   Track_Mode = Return_to_Line;
   //  Track_Mode = Go_Step;
@@ -884,14 +884,16 @@ void CommandCalc::MapTracer(int virtualgate_num, float mXvalue, float mYvalue, f
 
 void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa){
   /*前提条件：ロボットがライン上にあること*/
-  float y_t;
-  static float ref_odo;
-  static float ref_angle;
-  static float ref_tail_angle;
+  float          y_t;
+  static float   ref_odo;
+  static float   ref_angle;
+  static float   ref_tail_angle;
   static int32_t clock_start;
-  static int   dansa_cnt;
-  static int stable_cnt;
-  
+  static int     dansa_cnt;
+  static int     stable_cnt;
+  static float   bat_gain;
+  float  dat_gain;
+
   switch(Step_Mode){
 
   case Step_Start:
@@ -901,9 +903,20 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     ref_odo = odo + STEP_START_LENGTH;
  
 
-    clock_start = gClock->now();
+    clock_start  = gClock->now();
     anglecommand = TAIL_ANGLE_RUN;
-    Step_Mode = Approach_to_Step;   
+    Step_Mode    = Approach_to_Step;   
+
+    
+    //    bat_gain     = 1.0 - ((bat_mv - 8300)*0.002);
+    bat_gain     = 1.0 - ((bat_mv - 8100)*0.002);
+
+    if(bat_gain < 0.8){
+      bat_gain = 0.8;
+    }
+    if(bat_gain > 1.2){
+      bat_gain = 1.2;
+    }
 
 #ifdef STEP_DEBUG
     //    Step_Mode   =  First_Dansa;   
@@ -917,7 +930,8 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 
     if(odo > ref_odo){
       //      forward    =  20;
-      forward    =  40;
+      dat_gain   = (40.0 * bat_gain)+0.5;
+      forward    =  (int)dat_gain;
 
       y_t        = -0.5*( RAD_88p5_DEG - angle);
       yawratecmd = y_t;
@@ -975,8 +989,16 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
       }else{
 	forward    = gForward->calc_pid(ref_odo, odo);
 	forward     = forward * 0.4;
-	if(forward > STEP_CLIMB_MAX_SPEED){
+	/*
+	  if(forward > STEP_CLIMB_MAX_SPEED){
 	  forward     = STEP_CLIMB_MAX_SPEED;
+	  }
+	*/
+	dat_gain =  STEP_CLIMB_MAX_SPEED * bat_gain;
+	
+	if(forward > dat_gain){
+	  dat_gain = dat_gain + 0.5;
+	  forward     = (int)dat_gain;
 	}
 
 	yawratecmd = 0;
@@ -994,6 +1016,11 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
   case First_Dansa_On:
     forward = gForward->calc_pid(ref_odo, odo);
     forward = forward * 0.1;
+
+    dat_gain     = (forward * bat_gain)+0.5;
+    forward      = (int)dat_gain;
+
+
     yawratecmd = 0;
     anglecommand = ref_tail_angle;
 
@@ -1027,6 +1054,12 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
   case Fst_Turn_Pos_Adj:
     forward = gForward->calc_pid(ref_odo, odo);
     forward = forward * 0.1;
+
+    dat_gain     = (forward * bat_gain)+0.5;
+    forward      = (int)dat_gain;
+
+
+
     yawratecmd = 0;
     anglecommand = ref_tail_angle;
     
@@ -1099,6 +1132,10 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
     }else{
       //      forward    = 10;
       forward    =  STEP_CLIMB_MAX_SPEED;
+
+      dat_gain     = (forward * bat_gain)+0.5;
+      forward      = (int)dat_gain;
+
       y_t        = -0.5*(2.5*PAI - angle);
       yawratecmd = y_t;
 
@@ -1151,9 +1188,20 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
 	forward     = gForward->calc_pid(ref_odo, odo);
 	//	forward     = forward * 0.2;
 	forward     = forward * 0.4;
+
+	/*
 	if(forward > STEP_CLIMB_MAX_SPEED){
 	  forward     = STEP_CLIMB_MAX_SPEED;
 	}
+	*/
+
+	dat_gain =  STEP_CLIMB_MAX_SPEED * bat_gain;
+	if(forward > dat_gain){
+	  dat_gain = dat_gain + 0.5;
+	  forward     = dat_gain;
+	}
+
+
 	yawratecmd  = 0;
 	clock_start = gClock->now();
       }
@@ -1171,6 +1219,10 @@ void CommandCalc::StepRunner(int line_value, float odo, float angle, bool dansa)
   case Second_Dansa_On:
     forward      = gForward->calc_pid(ref_odo, odo);
     forward      = forward * 0.2;
+
+    dat_gain     = (forward * bat_gain)+0.5;
+    forward      = (int)dat_gain;
+    
     yawratecmd   = 0;
     anglecommand = ref_tail_angle;
 
