@@ -37,19 +37,19 @@ public:
     int   encL      = 0;
     float yawrate   = 0;
     float abs_angle = 0;
-    bool  dansa     = 0;
+    bool  dansa     = false;
     //signals for robo movement
-    bool  robo_stop       = 0;
-    bool  robo_forward    = 0;
-    bool  robo_back       = 0;
-    bool  robo_turn_left  = 0;
-    bool  robo_turn_right = 0;
+    bool  robo_stop       = false;;
+    bool  robo_forward    = false;;
+    bool  robo_back       = false;;
+    bool  robo_turn_left  = false;;
+    bool  robo_turn_right = false;;
 
     float WheelAngVLt = 0;
     float WheelAngVRt = 0;
     float RoboVt      = 0;
     float RoboAngVt   = 0;
-    bool  stop_sys    = 0;
+    bool  stop_sys    = false;;
 
 #ifdef EYE_DEBUG
     void  saveData( );

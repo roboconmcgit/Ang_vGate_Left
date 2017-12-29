@@ -586,11 +586,13 @@ void robo_cyc(intptr_t exinf) {
 
 void robo_task(intptr_t exinf) {
 
+
 #ifdef LOG_RECORD  
   if (gTouchSensor.isPressed()){
     wup_tsk(MAIN_TASK);
   }
 #endif
+
 
   if (ev3_button_is_pressed(BACK_BUTTON)) {
     wup_tsk(MAIN_TASK);  // バックボタン押下
