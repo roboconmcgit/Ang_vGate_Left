@@ -51,6 +51,7 @@ TouchSensor gTouchSensor (PORT_1);
 //Clock       gClock;
 
 
+
 enum Sys_Mode{
     SYS_INIT            = 110,
     BT_CONECT           = 120,
