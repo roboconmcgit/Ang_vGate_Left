@@ -36,11 +36,11 @@ void Ang_Eye::init(){
 #ifdef DEBUG_NANSYO
   enum_Mode = DET_MOVEMENT;
 #endif
-  robo_stop       = 1;
-  robo_forward    = 0;
-  robo_back       = 0;
-  robo_turn_left  = 0;
-  robo_turn_right = 0;
+  robo_stop       = true;
+  robo_forward    = false;
+  robo_back       = false;
+  robo_turn_left  = false;
+  robo_turn_right = false;
 
 }
 
@@ -110,11 +110,11 @@ void Ang_Eye::WheelOdometry(float dT) {
 
   switch(enum_Mode){
   case CALIB_ANGLE:  
-    robo_stop       = 0;
-    robo_forward    = 1;
-    robo_back       = 0;
-    robo_turn_left  = 0;
-    robo_turn_right = 0;
+    robo_stop       = false;
+    robo_forward    = true;
+    robo_back       = false;
+    robo_turn_left  = false;
+    robo_turn_right = false;
     //Correct absolute angle
     if(odo > 500 && odo <= 1500 && cap_cnt < cap_size){
       //cap_dat[cap_cnt] = abs_angle;
@@ -164,43 +164,43 @@ void Ang_Eye::WheelOdometry(float dT) {
     if (dif_angle_ave_dat > -0.001 && dif_angle_ave_dat < 0.001){
 
       if(velocity_ave_dat > 0){
-	robo_stop       = 0;
-	robo_forward    = 1;
-	robo_back       = 0;
-	robo_turn_left  = 0;
-	robo_turn_right = 0;
+	robo_stop       = false;
+	robo_forward    = true;
+	robo_back       = false;
+	robo_turn_left  = false;
+	robo_turn_right = false;
       }else if (velocity_ave_dat < 0){
-	robo_stop       = 0;
-	robo_forward    = 0;
-	robo_back       = 1;
-	robo_turn_left  = 0;
-	robo_turn_right = 0;
+	robo_stop       = false;
+	robo_forward    = false;
+	robo_back       = true;
+	robo_turn_left  = false;
+	robo_turn_right = false;
       }else{
-	robo_stop       = 1;
-	robo_forward    = 0;
-	robo_back       = 0;
-	robo_turn_left  = 0;
-	robo_turn_right = 0;
+	robo_stop       = true;
+	robo_forward    = false;
+	robo_back       = false;
+	robo_turn_left  = false;
+	robo_turn_right = false;
       }
 
     }else if(dif_angle_ave_dat >= 0.001){
-      robo_stop       = 0;
-      robo_forward    = 0;
-      robo_back       = 0;
-      robo_turn_left  = 1;
-      robo_turn_right = 0;
+      robo_stop       = false;
+      robo_forward    = false;
+      robo_back       = false;
+      robo_turn_left  = true;
+      robo_turn_right = false;
     }else if(dif_angle_ave_dat <= -0.001){
-      robo_stop       = 0;
-      robo_forward    = 0;
-      robo_back       = 0;
-      robo_turn_left  = 0;
-      robo_turn_right = 1;
+      robo_stop       = false;
+      robo_forward    = false;
+      robo_back       = false;
+      robo_turn_left  = false;
+      robo_turn_right = true;
     }else {
-      robo_stop       = 0;
-      robo_forward    = 0;
-      robo_back       = 0;
-      robo_turn_left  = 0;
-      robo_turn_right = 0;
+      robo_stop       = false;
+      robo_forward    = false;
+      robo_back       = false;
+      robo_turn_left  = false;
+      robo_turn_right = false;
     }
     
 break;
@@ -227,7 +227,7 @@ void Ang_Eye::det_Dansa( ) {
  
   for(cnt = 0; cnt < 250; cnt++){
     if(gyro_250d[cnt] < -100 || gyro_250d[cnt] > 100){
-      dansa = 1;
+      dansa = true;
       cnt = 250;
     }else{
       dansa = 0;

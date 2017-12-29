@@ -162,11 +162,11 @@ private:
 
 
     //signals for robo movement
-    bool  mRobo_stop       = 0;
-    bool  mRobo_forward    = 0;
-    bool  mRobo_back       = 0;
-    bool  mRobo_turn_left  = 0;
-    bool  mRobo_turn_right = 0;
+    bool  mRobo_stop       = false;
+    bool  mRobo_forward    = false;
+    bool  mRobo_back       = false;
+    bool  mRobo_turn_left  = false;
+    bool  mRobo_turn_right = false;
 
     bool  mDansa;      //段差検出値
     bool  mRobo_balance_mode;
